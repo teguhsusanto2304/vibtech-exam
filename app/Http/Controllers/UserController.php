@@ -42,7 +42,8 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $pageTitle='Create A New User';
-        return view('admin.users.form', compact('pageTitle'));
+        $user = null;
+        return view('admin.users.form', compact('pageTitle','user'));
     }
 
     public function store(Request $request)
