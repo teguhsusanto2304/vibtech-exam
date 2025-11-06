@@ -141,7 +141,7 @@
                                                             {{ $attempt->data_score }}%
                                                         </td>
                                                         <td class="px-6 py-4">
-                                                            {{ $attempt->calculate_duration->forHumans() }}
+                                                            
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}
