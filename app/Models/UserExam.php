@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class UserExam extends Model
 {
@@ -107,6 +108,26 @@ class UserExam extends Model
 
     public function getDataScoreAttribute()
     {
-        return ($this->answers()->where('is_correct', true)->count()/$this->answers()->count())*100;
+        return round(($this->answers()->where('is_correct', true)->count()/$this->answers()->count())*100);
+    }
+
+    public function getCalculateDurationAttribute()
+    {
+        // Query the related answers to find the min and max created_at timestamps
+        $times = $this->answers()
+                    ->selectRaw('MIN(created_at) as start_time, MAX(created_at) as end_time')
+                    ->first();
+
+        // Check if any answers exist
+        if (!$times || !$times->start_time || !$times->end_time) {
+            return null; // Return null if no answers were submitted
+        }
+
+        // Convert the database timestamps to Carbon instances
+        $startTime = Carbon::parse($times->start_time);
+        $endTime = Carbon::parse($times->end_time);
+
+        // Calculate the difference and return it as a CarbonInterval
+        return $startTime->diffAsCarbonInterval($endTime);
     }
 }

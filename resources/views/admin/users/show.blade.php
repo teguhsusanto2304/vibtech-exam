@@ -141,12 +141,7 @@
                                                             {{ $attempt->data_score }}%
                                                         </td>
                                                         <td class="px-6 py-4">
-                                                            @if($attempt->started_at && $attempt->finished_at)
-                            {{ $attempt->started_at->diffForHumans($attempt->finished_at, true) }}
-                        @else
-                            0
-                        @endif
-                        of {{ $attempt->durations }} Mins
+                                                            {{ $attempt->calculate_duration->forHumans() }}
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}

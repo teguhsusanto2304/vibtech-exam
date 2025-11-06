@@ -36,9 +36,21 @@
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold tracking-tight text-gray-800 dark:text-white">Vibtech Genesis Examination Portal</h2>
                 </div>
-                <button class="flex items-center justify-center rounded-full h-10 w-10 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                    <span class="material-symbols-outlined">person</span>
-                </button>
+
+                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a href="#" 
+   onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+   class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500">
+    
+    <span class="material-symbols-outlined text-xl">logout</span>
+    <span class="text-sm font-semibold">Exit</span>
+</a>
+
+{{-- Hidden Form for secure POST request --}}
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+</a>
             </header>
             <main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
                 <div class="layout-content-container flex flex-col w-full max-w-2xl">
@@ -66,6 +78,7 @@
                         </div>
 
                         <!-- Start Exam Button -->
+                         @if((int) $arrExam['attempt_used']< 3)
                         <div class="flex flex-col items-center">
                             <div x-data="{ open: false }" class="w-full flex flex-col items-center">
                                 <button id="startExamBtn" class="w-full max-w-xs flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-lg font-bold tracking-wider hover:bg-blue-800 transition-colors duration-300 shadow-md hover:shadow-lg">
@@ -73,6 +86,7 @@
                                 </button>
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
             </main>
@@ -144,7 +158,7 @@
             // 5. Handle the confirmation action
             confirmStartBtn.addEventListener('click', () => {
                 //hideModal();
-                window.location.href = "{{ route('exam',['examId'=>$arrExam['examId']]) }}";
+                window.location.href = "{{ route('start-exam',['examId'=>$arrExam['examId']]) }}";
                 // In a real application, you would navigate to the exam page here.
                 console.log("Exam confirmed and starting...");
                 // Example of where navigation or API call would go:

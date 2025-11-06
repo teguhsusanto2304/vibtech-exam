@@ -121,10 +121,21 @@ class ExamineeController extends Controller
         return view('examinee.dashboard',compact('exams','arrExam'));
     }
 
+    public function startExam($examId)
+    {
+        $userExam = UserExam::with('exam')->where(['user_id'=> auth()->id(),'data_status'=>'pending'])->firstOrFail();
+        $userExam->started_at = now();
+        $userExam->save();
+        $del = UserAnswer::where('user_exam_id',$userExam->id);
+        $del->delete();
+        return redirect()->route('exam',['examId'=>$examId]);
+    }
+
     public function exam($examId)
     {
         $userExam = UserExam::with('exam')->where('user_id', auth()->id())->firstOrFail();
-        
+        $userExam->started_at = now();
+        $userExam->save();
         // Get exam questions with question details
         $questions = ExamQuestion::with('question')
             ->where('exam_id', $userExam->exam_id)
@@ -202,6 +213,10 @@ class ExamineeController extends Controller
 
     public function done()
     {
-        return view('examinee.done');
+        $userExam = UserExam::with('exam')->where(['user_id'=> auth()->id(),'data_status'=>'pending'])->firstOrFail();
+        $userExam->finished_at = now();
+        $userExam->attempts_used = $userExam->attempts_used+1;
+        $userExam->save();
+        return view('examinee.done',compact('userExam'));
     }
 }

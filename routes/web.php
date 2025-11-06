@@ -10,21 +10,26 @@ use App\Http\Controllers\CKEditorController;
 
 Route::post('/ckeditor/upload', [CKEditorController::class, 'upload'])->name('ckeditor.upload');
 
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [ExamineeController::class,'dashboard'])->name('dashboard');
+    Route::get('/{examId}/start-exam', [ExamineeController::class,'startExam'])->name('start-exam');
+    Route::get('/{examId}/exam', [ExamineeController::class,'exam'])->name('exam');
+    Route::get('/exam/{examId}/questions', [ExamineeController::class, 'questions'])->name('exam.questions');
+    Route::post('/exam/{examId}/answer', [ExamineeController::class, 'storeAnswer'])
+        ->name('exam.answer.store');
+    Route::post('/exam/answer', [ExamineeController::class,'exam'])->name('exam.answer');
+    Route::get('/done', [ExamineeController::class,'done'])->name('done');
+    Route::post('/logout', [ExamineeController::class, 'logout'])->name('logout');
+});
 Route::get('/', [ExamineeController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [ExamineeController::class, 'login'])->name('login.submit');
-Route::post('/logout', [ExamineeController::class, 'logout'])->name('logout');
-
-Route::get('/dashboard', [ExamineeController::class,'dashboard'])->name('dashboard');
-Route::get('/{examId}/exam', [ExamineeController::class,'exam'])->name('exam');
-Route::get('/exam/{examId}/questions', [ExamineeController::class, 'questions'])->name('exam.questions');
-Route::post('/exam/{examId}/answer', [ExamineeController::class, 'storeAnswer'])
-    ->name('exam.answer.store');
-Route::post('/exam/answer', [ExamineeController::class,'exam'])->name('exam.answer');
-Route::get('/done', [ExamineeController::class,'done'])->name('done');
+    
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
     Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
+    
 });
 
 

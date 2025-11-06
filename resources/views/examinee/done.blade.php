@@ -45,19 +45,19 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#dbe0e6] dark:border-white/10 bg-background-light dark:bg-background-dark">
 <p class="text-[#617589] dark:text-gray-400 text-base font-medium leading-normal">Total Questions</p>
-<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">50</p>
+<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">{{ $userExam->exam->questions }}</p>
 </div>
 <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#dbe0e6] dark:border-white/10 bg-background-light dark:bg-background-dark">
 <p class="text-[#617589] dark:text-gray-400 text-base font-medium leading-normal">Correct Answers</p>
-<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">42</p>
+<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">{{ ($userExam->exam->questions/100)*$userExam->data_score }} %</p>
 </div>
 <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#dbe0e6] dark:border-white/10 bg-background-light dark:bg-background-dark">
 <p class="text-[#617589] dark:text-gray-400 text-base font-medium leading-normal">Score</p>
-<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">85%</p>
+<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">{{ $userExam->data_score }}%</p>
 </div>
 <div class="flex min-w-[158px] flex-1 flex-col col-span-1 sm:col-span-2 md:col-span-3 gap-2 rounded-lg p-6 border border-[#dbe0e6] dark:border-white/10 bg-background-light dark:bg-background-dark">
 <p class="text-[#617589] dark:text-gray-400 text-base font-medium leading-normal">Attempts Used</p>
-<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">1 of 3</p>
+<p class="text-[#111418] dark:text-white tracking-light text-2xl font-bold leading-tight">{{ $userExam->attempts_used }} of 3</p>
 </div>
 </div>
 <p class="text-[#111418] dark:text-gray-300 text-base font-normal leading-normal pb-3 pt-1 px-4 text-center">
