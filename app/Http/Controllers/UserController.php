@@ -60,7 +60,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => bcrypt($validated['password']),
             'role' => $validated['role'] ?? 'user', // default to "user" if not provided
             'company' => $validated['company'] ?? null,
         ]);
