@@ -71,8 +71,13 @@
                 <select id="role" name="role"
                         class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
                     <option value="">Choose Role</option>
+                    @if(!empty($user))
                     <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                     <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
+                    @else
+                    <option value="admin" >Admin</option>
+                    <option value="user" >User</option>
+                    @endif
                 </select>
             </div>
 
