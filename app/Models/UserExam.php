@@ -118,8 +118,8 @@ class UserExam extends Model
 
     public function getCalculateDurationAttribute()
     {
-        // Query the related answers to find the min and max created_at timestamps
-        $times = $this->answers()
+        if(!empty($times->start_time) ){
+$times = $this->answers()
                     ->selectRaw('MIN(created_at) as start_time, MAX(created_at) as end_time')
                     ->first();
 
@@ -131,8 +131,14 @@ class UserExam extends Model
         // Convert the database timestamps to Carbon instances
         $startTime = Carbon::parse($times->start_time);
         $endTime = Carbon::parse($times->end_time);
+        $result = $startTime->diffAsCarbonInterval($endTime);
+        } else {
+            $result = 0;
+        }
+        // Query the related answers to find the min and max created_at timestamps
+        
 
         // Calculate the difference and return it as a CarbonInterval
-        return $startTime->diffAsCarbonInterval($endTime);
+        return $result;
     }
 }
