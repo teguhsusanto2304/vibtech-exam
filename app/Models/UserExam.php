@@ -108,7 +108,12 @@ class UserExam extends Model
 
     public function getDataScoreAttribute()
     {
-        return round(($this->answers()->where('is_correct', true)->count()/$this->answers()->count())*100);
+        if($this->answers()->where('is_correct', true)->count() > 0) { 
+            $result = round(($this->answers()->where('is_correct', true)->count()/$this->answers()->count())*100);
+        } else {
+            $result = 0;
+        }
+        return $result;
     }
 
     public function getCalculateDurationAttribute()
