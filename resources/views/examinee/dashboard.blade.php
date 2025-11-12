@@ -5,32 +5,32 @@
 @section('content')
 <main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
     <div class="layout-content-container flex flex-col w-full max-w-2xl">
-        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6 md:p-8">
+        <div class="bg-white shadow-xl rounded-xl p-6 md:p-8">
             <div class="flex flex-wrap justify-between gap-4 mb-6">
-                <h1 class="text-3xl font-black tracking-tight text-primary dark:text-blue-300">{{ $arrExam['title'] }}</h1>
+                <h1 class="text-3xl font-black tracking-tight text-primary">{{ $arrExam['title'] }}</h1>
             </div>
             <div class="flex flex-wrap justify-between gap-4 mb-6">
-                <h2 class="text-1xl text-primary dark:text-blue-300">{{ $arrExam['description'] }}</h2>
+                <h2 class="text-1xl text-primary">{{ $arrExam['description'] }}</h2>
             </div>
 
             <!-- Exam Details Card -->
-            <div class="mb-8 p-4 border-l-4 border-primary/30 dark:border-blue-500/50 bg-primary/10 dark:bg-blue-900/20 rounded-lg">
+            <div class="mb-8 p-4 border-l-4 border-primary/30 dark:border-white-500/50 bg-primary/10 dark:bg-white-900/20 rounded-lg">
                 <div class="grid grid-cols-1 sm:grid-cols-[150px_1fr] gap-x-6 gap-y-4">
                     <div class="col-span-2 sm:grid sm:grid-cols-subgrid border-b border-b-gray-300 dark:border-b-gray-600 py-4">
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Total Questions</p>
-                        <p class="text-gray-900 dark:text-white text-base font-semibold">{{ $arrExam['questions'] }}</p>
+                        <p class="text-gray-500  text-sm font-normal">Total Questions</p>
+                        <p class="text-gray-900  text-base font-semibold">{{ $arrExam['questions'] }}</p>
                     </div>
                     <div class="col-span-2 sm:grid sm:grid-cols-subgrid border-b border-b-gray-300 dark:border-b-gray-600 py-4">
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Time Allotment</p>
-                        <p class="text-gray-900 dark:text-white text-base font-semibold">{{ $arrExam['duration'] }} Minutes</p>
+                        <p class="text-gray-500  text-sm font-normal">Time Allotment</p>
+                        <p class="text-gray-900  text-base font-semibold">{{ $arrExam['duration'] }} Minutes</p>
                     </div>
                     <div class="col-span-2 sm:grid sm:grid-cols-subgrid border-b border-b-gray-300 dark:border-b-gray-600 py-4">
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Passing Rate</p>
-                        <p class="text-gray-900 dark:text-white text-base font-semibold">{{ $arrExam['pass_mark'] }} %</p>
+                        <p class="text-gray-500  text-sm font-normal">Passing Rate</p>
+                        <p class="text-gray-900  text-base font-semibold">{{ $arrExam['pass_mark'] }} %</p>
                     </div>
                     <div class="col-span-2 sm:grid sm:grid-cols-subgrid pt-4">
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">Attempts Used</p>
-                        <p class="text-gray-900 dark:text-white text-base font-semibold">{{ $arrExam['attempt_used'] }} of 3</p>
+                        <p class="text-gray-500  text-sm font-normal">Attempts Used</p>
+                        <p class="text-gray-900  text-base font-semibold">{{ $arrExam['attempt_used'] }} of 3</p>
                     </div>
                 </div>
             </div>
@@ -58,13 +58,13 @@
 
     <!-- Modal Content -->
     <div
-        class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg z-10 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] flex flex-col">
+        class="bg-white  rounded-xl shadow-2xl w-full max-w-lg z-10 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] flex flex-col">
         
         <!-- Header -->
-        <div class="p-4 text-center border-b border-gray-200 dark:border-gray-700">
+        <div class="p-4 text-center border-b border-gray-200 ">
             <span class="material-symbols-outlined text-primary text-5xl">task_alt</span>
-            <h1 class="text-3xl font-black text-[#111418] dark:text-white mt-4">Exam Rules & Instructions</h1>
-            <p class="text-[#617589] dark:text-gray-400 text-base mt-2">Please read the rules carefully before starting.</p>
+            <h1 class="text-3xl font-black text-[#111418]  mt-4">Exam Rules & Instructions</h1>
+            <p class="text-[#617589] text-base mt-2">Please read the rules carefully before starting.</p>
         </div>
 
         <!-- Scrollable Body -->

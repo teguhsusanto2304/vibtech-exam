@@ -34,7 +34,7 @@
                             </defs>
                         </svg>
                     </div>
-                    <h2 class="text-lg sm:text-xl font-bold tracking-tight text-gray-800 dark:text-white">Vibtech Genesis Examination Portal</h2>
+                    <h2 class="text-lg sm:text-xl font-bold tracking-tight text-gray-800">Vibtech Genesis Examination Portal</h2>
                 </div>
 
                 <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="#">

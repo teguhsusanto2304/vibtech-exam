@@ -68,10 +68,10 @@
 <body class="bg-background-light dark:bg-background-dark font-display">
   <div class="flex flex-col min-h-screen w-full">
     <div class="flex flex-1 justify-center py-5">
-      <div class="layout-content-container flex flex-col bg-white dark:bg-gray-900 shadow-md rounded-lg overflow-hidden">
+      <div class="layout-content-container flex flex-col bg-white shadow-md rounded-lg overflow-hidden">
         <!-- HEADER -->
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-700 px-6 sm:px-10 py-3 bg-white dark:bg-background-dark">
-          <div class="flex items-center gap-4 text-gray-800 dark:text-white">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200  px-6 sm:px-10 py-3 bg-white ">
+          <div class="flex items-center gap-4 text-gray-800 ">
             <span class="material-symbols-outlined text-primary text-3xl">waves</span>
             <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Vibtech Genesis Examination Portal</h2>
           </div>
