@@ -14,6 +14,7 @@ Route::post('/ckeditor/upload', [CKEditorController::class, 'upload'])->name('ck
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ExamineeController::class,'dashboard'])->name('dashboard');
     Route::get('/{examId}/start-exam', [ExamineeController::class,'startExam'])->name('start-exam');
+    Route::get('/{examId}/complete-exam', [ExamineeController::class,'completeExam'])->name('complete-exam');
     Route::get('/{examId}/exam', [ExamineeController::class,'exam'])->name('exam');
     Route::get('/exam/{examId}/questions', [ExamineeController::class, 'questions'])->name('exam.questions');
     Route::post('/exam/{examId}/answer', [ExamineeController::class, 'storeAnswer'])
@@ -22,13 +23,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/done', [ExamineeController::class,'done'])->name('done');
     Route::post('/logout', [ExamineeController::class, 'logout'])->name('logout');
 });
-Route::get('/', [ExamineeController::class, 'showLoginForm'])->name('login');
+//Route::get('/', [ExamineeController::class, 'showLoginForm'])->name('login');
+Route::get('/', [AdminController::class,'login'])->name('login');
 Route::post('/login', [ExamineeController::class, 'login'])->name('login.submit');
     
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
-    Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
+    Route::post('/admin/dologin', [AdminController::class,'generalLogin'])->name('admin.dologin');
     
 });
 
@@ -47,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/users/{userId}/save-assign-exam',[UserController::class,'saveAssignExam'])->name('admin.users.save-assign-exam');
     Route::get('/admin/users/{id}/edit', [UserController::class,'edit'])->name('admin.users.edit');
     Route::delete('/admin/users/{id}/destroy', [UserController::class,'destroy'])->name('admin.users.destroy');
+    Route::get('/admin/users/{id}/status', [UserController::class, 'toggleStatus'])->name('admin.users.status');
 
     Route::get('/admin/exams', [ExamController::class,'index'])->name('admin.exams');
     Route::get('/admin/exams/create', [ExamController::class,'create'])->name('admin.exams.create');

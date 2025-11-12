@@ -65,7 +65,10 @@
                                                             Status
                                                         </th>
                                                         <th class="px-6 py-4 font-medium">
-                                                            Score
+                                                            Attempts Used
+                                                        </th>
+                                                        <th class="px-6 py-4 font-medium">
+                                                            Last Score
                                                         </th>
                                                         <th class="px-6 py-4 font-medium">
                                                             Duration
@@ -136,6 +139,9 @@
                             {{ ucfirst($attempt->data_status) }}
                                                             </span>
                                                             @endif
+                                                        </td>
+                                                        <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400">
+                                                            {{ $attempt->attempts_used }}
                                                         </td>
                                                         <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400">
                                                             {{ $attempt->data_score }}%

@@ -60,7 +60,21 @@
                     {{-- Action buttons --}}
                     @if (!empty($actions))
                         <td class="border px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white" >
-                            @if(isset($actions['show']))
+                        @if(isset($actions['status']))
+                            <a href="{{ route($actions['status'], $item->id) }}"
+                            class="inline-flex items-center justify-center w-8 h-8 
+                                    {{ $item->status === 'active' ? 'text-green-600 hover:bg-green-100' : 'text-gray-500 hover:bg-gray-100' }}
+                                    rounded-full transition"
+                            title="{{ $item->status === 'active' ? 'Deactivate User' : 'Activate User' }}">
+                            
+                            @if($item->data_status === 'active')
+                                <x-heroicon-o-eye class="w-4 h-4" />   {{-- Active → show open eye --}}
+                            @else
+                                <x-heroicon-o-eye-slash class="w-4 h-4" /> {{-- Inactive → show eye with slash --}}
+                            @endif
+                            </a>
+                        @endif   
+                        @if(isset($actions['show']))
                                 <a href="{{ route($actions['show'], $item->id) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-blue-600 hover:bg-blue-100 rounded-full"
                                    title="View">

@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div id="question-container" class="mt-4 w-[640px]">
+    <div id="question-container" class="mt-4">
         <h3 id="question-text" class="text-xl font-semibold mb-3"></h3>
         <form id="options-form" class="space-y-2"></form>
     </div>
@@ -33,53 +33,10 @@
 </div>
 
 <script>
-    window.history.pushState(null, "", window.location.href);
-
-// Tangkap setiap kali ada upaya untuk menavigasi (menekan tombol Back/Forward)
-window.onpopstate = function() {
-    // Segera dorong status yang sama lagi ke history untuk memblokir navigasi mundur
-    window.history.pushState(null, "", window.location.href);
-};
-
-// 2. BLOKIR F5 dan CTRL+R (Mencegah refresh keyboard)
-document.onkeydown = function(e) {
-    // keyCode 116 adalah F5
-    // e.ctrlKey && keyCode 82 adalah Ctrl+R
-    if (e.keyCode === 116 || (e.ctrlKey && e.keyCode === 82)) {
-        e.preventDefault();
-        return false;
-    }
-    // Tambahan: Mencegah tombol Backspace memicu navigasi mundur di beberapa browser
-    // keyCode 8 adalah Backspace, dan pastikan bukan dari input atau textarea
-    if (e.keyCode === 8 && (e.target.nodeName !== 'INPUT' && e.target.nodeName !== 'TEXTAREA')) {
-        e.preventDefault();
-        return false;
-    }
-};
-
-// 3. BLOKIR REFRESH LAINNYA (Mencegah refresh browser/klik kanan)
-window.onbeforeunload = function(event) {
-    // Mencegah navigasi atau refresh tanpa konfirmasi (di browser modern,
-    // ini hanya berfungsi sebagai pencegah, string yang dikembalikan biasanya diabaikan)
-    event.returnValue = "Anda akan kehilangan progres ujian jika memuat ulang halaman.";
-    return "Anda akan kehilangan progres ujian jika memuat ulang halaman.";
-};
-
 document.addEventListener('DOMContentLoaded', async () => {
     const examId = "{{ $exam->id }}";
     const res = await fetch(`/exam/${examId}/questions`);
-    let questions = await res.json();
-
-    // 🔀 Randomize the order of questions
-    questions = questions.sort(() => Math.random() - 0.5);
-
-    // 🔀 Randomize options for each question
-    questions = questions.map(q => {
-        const shuffledOptions = Object.entries(q.options)
-            .sort(() => Math.random() - 0.5);
-        q.options = Object.fromEntries(shuffledOptions);
-        return q;
-    });
+    const questions = await res.json();
 
     let current = 0;
     const total = questions.length;
@@ -192,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadQuestion(current);
         } else {
             alert('Exam finished!');
-            window.location.href = "{{ route('complete-exam',['examId'=>$userExam->id]) }}";
+            window.location.href = "{{ route('done') }}";
         }
     });
 
@@ -202,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalSeconds--;
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = Math.floor(totalSeconds % 60);
+        const seconds = totalSeconds % 60;
 
         document.getElementById('hours').textContent = hours;
         document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
@@ -217,29 +174,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load the first question
     loadQuestion(current);
 });
-
-/**--- Prevent back navigation and reload 
-window.history.pushState(null, "", window.location.href);
-window.onpopstate = function () {
-    window.history.pushState(null, "", window.location.href);
-    alert("Back navigation is disabled during the exam.");
-};
-
-window.addEventListener("beforeunload", function (e) {
-    e.preventDefault();
-    e.returnValue = "";
-    alert("Reloading the page is not allowed during the exam.");
-});
-
-document.addEventListener("keydown", function (e) {
-    if (e.key === "F5" || (e.ctrlKey && e.key.toLowerCase() === "r")) {
-        e.preventDefault();
-        alert("Reload is disabled during the exam.");
-    }
-});
-
-document.addEventListener("contextmenu", (e) => e.preventDefault());
-**/
-
 </script>
 @endsection

@@ -113,11 +113,18 @@ class ExamineeController extends Controller
         foreach ($exams as $row) {
             $arrExam['title'] = $row->exam->title; // Access the related Exam model
             $arrExam['questions'] = $row->exam->questions;
+            $arrExam['description'] = $row->exam->description;            
+            $arrExam['pass_mark'] = $row->exam->pass_mark;
             $arrExam['duration'] = $row->exam->duration;
             $arrExam['attempt_used'] = $row->attempts_used;
             $arrExam['instruction'] = $row->exam->instruction;
             $arrExam['examId'] = $row->exam->id;
+            session([
+                'exam_duration' => $row->exam->duration,
+                'exam_id'       => $row->exam->id,
+            ]);
         }
+        
         return view('examinee.dashboard',compact('exams','arrExam'));
     }
 
@@ -128,14 +135,44 @@ class ExamineeController extends Controller
         $userExam->save();
         $del = UserAnswer::where('user_exam_id',$userExam->id);
         $del->delete();
-        return redirect()->route('exam',['examId'=>$examId]);
+        
+        foreach ($userExam as $row) {
+                session([
+                'exam_duration' => $userExam->exam->duration,
+                'exam_id'       => $userExam->exam->id,
+                'exam_start_time' => now(), // Save the start timestamp
+            ]);
+        }
+
+        // Calculate remaining time
+        $remainingSeconds = $this->calculateRemainingTime();
+
+        // Redirect to exam page with remaining time
+        return redirect()->route('exam', [
+            'examId' => $examId,
+            'remainingSeconds' => $remainingSeconds,
+        ]);
+    }
+
+    private function calculateRemainingTime()
+    {
+        $durationMinutes = session('exam_duration');
+        $startTime = session('exam_start_time');
+
+        if (!$startTime || !$durationMinutes) {
+            return 0;
+        }
+
+        $elapsed = now()->diffInSeconds($startTime);
+        $remaining = max(($durationMinutes * 60) - $elapsed, 0);
+
+        return $remaining;
     }
 
     public function exam($examId)
     {
         $userExam = UserExam::with('exam')->where('user_id', auth()->id())->firstOrFail();
-        $userExam->started_at = now();
-        $userExam->save();
+
         // Get exam questions with question details
         $questions = ExamQuestion::with('question')
             ->where('exam_id', $userExam->exam_id)
@@ -155,10 +192,11 @@ class ExamineeController extends Controller
             $shuffledOptions = collect($options)->shuffle();
 
             $exam = Exam::with('masterExamQuestions.question')->findOrFail($examId);
+            $remainingSeconds = $this->calculateRemainingTime();
 
 
         //$examQuestions = $userExam->exam->masterExamQuestions;
-        return view('examinee.exam',compact('exam','userExam', 'question','shuffledOptions'));
+        return view('examinee.exam',compact('exam','userExam', 'question','shuffledOptions','remainingSeconds'));
     }
 
     public function questions($examId)
@@ -176,6 +214,7 @@ class ExamineeController extends Controller
                     'D' => $eq->question->option_d,
                 ],
                 'correct' => $eq->question->correct_option,
+                'explanation' => $eq->question->explanation,
             ];
         });
 
@@ -211,12 +250,35 @@ class ExamineeController extends Controller
         ]);
     }
 
-    public function done()
+    public function completeExam()
     {
-        $userExam = UserExam::with('exam')->where(['user_id'=> auth()->id(),'data_status'=>'pending'])->firstOrFail();
+        $userExam = UserExam::with('exam','answers')->where(['user_id'=> auth()->id(),'data_status'=>'pending'])->firstOrFail();
+        
+        $correctAnswers = $userExam->answers->where('is_correct', true);
+        $score = ($correctAnswers->count()/$userExam->exam->questions)*100;
         $userExam->finished_at = now();
+        $userExam->scores = $score;
         $userExam->attempts_used = $userExam->attempts_used+1;
         $userExam->save();
-        return view('examinee.done',compact('userExam'));
+        return redirect()->route('done');
+    }
+
+    public function done()
+    {
+        $userExam = UserExam::with('exam','answers')->where(['user_id'=> auth()->id(),'data_status'=>'pending'])->firstOrFail();
+        
+        $correctAnswers = $userExam->answers->where('is_correct', true);
+        // Count how many are correct
+        $correctCount = $correctAnswers->count();
+        $score = ($correctAnswers->count()/$userExam->exam->questions)*100;
+        if ($userExam->scores >= $userExam->exam->pass_mark) {
+            $status = 'passed';
+        } elseif ($userExam->attempts_used >= 3 && $userExam->scores < $userExam->exam->pass_mark) {
+            $status = 'failed_max';
+        } else {
+            $status = 'failed';
+        }
+
+        return view('examinee.done',compact('userExam','correctCount','status'));
     }
 }

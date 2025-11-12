@@ -23,11 +23,11 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 <div class="flex flex-col gap-2 rounded-xl p-6 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
 <p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal">Active Users</p>
-<p class="text-text-light-primary dark:text-text-dark-primary tracking-tight text-3xl font-bold leading-tight">1,204</p>
+<p class="text-text-light-primary dark:text-text-dark-primary tracking-tight text-3xl font-bold leading-tight">{{ $users }}</p>
 </div>
 <div class="flex flex-col gap-2 rounded-xl p-6 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
 <p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal">Deactivated Users</p>
-<p class="text-text-light-primary dark:text-text-dark-primary tracking-tight text-3xl font-bold leading-tight">89</p>
+<p class="text-text-light-primary dark:text-text-dark-primary tracking-tight text-3xl font-bold leading-tight">{{ $inactive_users }}</p>
 </div>
 <div class="flex flex-col gap-2 rounded-xl p-6 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
 <p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-medium leading-normal">Average Score</p>

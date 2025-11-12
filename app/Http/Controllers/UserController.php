@@ -11,32 +11,43 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = User::query();
+{
+    $query = User::query();
 
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter by role
-        if ($request->filled('role')) {
-            $query->where('role', $request->input('role'));
-        }
-
-        $users = $query->latest()->paginate(10);
-
-        // Return partial view for AJAX
-        if ($request->ajax()) {
-            return view('admin.users.table', compact('users'))->render();
-        }
-
-        return view('admin.users.index', compact('users'));
+    // Search
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('name', 'like', "%{$request->search}%")
+              ->orWhere('email', 'like', "%{$request->search}%");
+        });
     }
+
+    // Role filter
+    if ($request->filled('role') && in_array($request->role, ['admin', 'user'])) {
+        $query->where('role', $request->role);
+    }
+
+    // Status filter (active/inactive)
+    if ($request->filled('status') && in_array($request->status, ['active', 'inactive'])) {
+        $query->where('data_status', $request->status);
+    }
+
+        if(!$request->filled('search') && !$request->filled('role'))
+        {
+            $query->where(['role'=>'admin','data_status'=>'active']);
+        }
+
+
+
+    $users = $query->paginate(10);
+
+    if ($request->ajax()) {
+        return view('admin.users.table', compact('users'))->render();
+    }
+
+    return view('admin.users.index', compact('users'));
+}
+
 
 
     public function create(Request $request)
@@ -148,5 +159,17 @@ class UserController extends Controller
         $user = User::find($id);
         $pageTitle='Edit User';
         return view('admin.users.form', compact('pageTitle','user'));
+    }
+
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Toggle status
+        $user->data_status = $user->data_status === 'active' ? 'inactive' : 'active';
+        $user->save();
+
+        // Optional: add flash message
+        return back()->with('success', "User status changed to {$user->data_status}.");
     }
 }

@@ -46,7 +46,7 @@
 <img class="h-12 w-auto mb-4" data-alt="Vibtech Genesis Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCziq1bTMarfttnlutU9XXECXYIcm-eA4VthAvzXlEwJTXyPMyOvam9Q1_ycZF4Q1o9Z8IUM6Kh9ChJrgZQgGvZxfLJsYdgW5xiA9CFCLL7VNt6sflvg6KlzkA2n06ZTthfdtA1O30TYxP0t8ufTfxjP1Pig0tigvKt_LZ5_GV3VVGzh8RNu7X2BJKoHADG_MrDCVKp5-P2LB8tIJtRUJk9RJ6YGRec4lwyPiSYC9_Jn9B8ZYaxitmIHLkuKHPy8_jmsZhpstqYRhVR"/>
 </div>
 <div class="flex flex-col gap-3 p-4 text-center">
-<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">Admin Portal</p>
+<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">Vibtech Genesis Examination Portal</p>
 <p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Welcome back. Please log in to continue.</p>
 </div>
     @if ($errors->any())
@@ -100,8 +100,6 @@
     </div>
     <div class="mt-4">
     
-    <!-- Example of another error message -->
-    <!-- <p class="text-error text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">Your account is blocked. Please contact support.</p> -->
     </div>
 </form>
 <!-- END: Added Form Tag -->
