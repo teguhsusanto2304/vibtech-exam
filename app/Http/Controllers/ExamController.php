@@ -65,7 +65,7 @@ class ExamController extends Controller
             'randomize_options' => 'nullable',
             'randomize_questions' => 'nullable',
             'pass_mark' => 'required|integer|min:30|max:100',
-            'instruction' => 'required|min:10|max:500'
+            'instruction' => 'required|min:10'
         ]);
 
         // ✅ 2. Create exam (UUID handled automatically in the model)
@@ -102,7 +102,7 @@ class ExamController extends Controller
         'randomize_options' => 'nullable',
         'randomize_questions' => 'nullable',
         'pass_mark' => 'required|integer|min:30|max:100',
-        'instruction' => 'required|min:10|max:500'
+        'instruction' => 'required|min:10'
     ]);
 
     // 2. Prepare data for update

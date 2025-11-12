@@ -50,6 +50,13 @@ class AdminController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            if (Auth::user()->data_status=='inactive') {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You are not authorized to log in because you have no active on your account.',
+                    ])->onlyInput('email');
+                
+            }
             if(Auth::user()->role=='admin')
             {
                 return redirect()->intended('admin/dashboard')->with('success', 'Welcome back!');
