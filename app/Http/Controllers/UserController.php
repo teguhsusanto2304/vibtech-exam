@@ -172,4 +172,29 @@ class UserController extends Controller
         // Optional: add flash message
         return back()->with('success', "User status changed to {$user->data_status}.");
     }
+
+    public function updateExam(Request $request, $id)
+    {
+        $request->validate([
+            'active_date' => 'required|date',
+            'end_date' => 'required|date|after:active_date',
+        ]);
+
+        $exam = \App\Models\UserExam::findOrFail($id);
+        $exam->update([
+            'active_date' => $request->active_date,
+            'end_date' => $request->end_date,
+        ]);
+
+        return back()->with('success', 'Exam dates updated successfully.');
+    }
+
+    public function removeExam($id)
+    {
+        $attempt = UserExam::findOrFail($id);
+        $attempt->delete();
+
+        return redirect()->back()->with('success', 'Exam attempt removed successfully.');
+    }
+
 }

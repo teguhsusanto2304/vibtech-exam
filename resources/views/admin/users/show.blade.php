@@ -61,9 +61,7 @@
                                                         <th class="px-6 py-4 font-medium">
                                                             Exam Name
                                                         </th>
-                                                        <th class="px-6 py-4 font-medium">
-                                                            Status
-                                                        </th>
+                                                        
                                                         <th class="px-6 py-4 font-medium">
                                                             Attempts Used
                                                         </th>
@@ -81,7 +79,14 @@
                                                 <tbody>
                                                     @php $index=0; @endphp
             @forelse($userExams as $attempt)
-            @php $index++; @endphp
+            @php $index++; 
+                            $statusColors = [
+                                'cancel' => 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300',
+                                'pending' => 'bg-orange-100 text-orange-700 dark:bg-orange-800 dark:text-orange-300',
+                                'started' => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
+                                'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+                            ];
+                        @endphp
                                                     <tr class="border-b border-[#E0E0E0] dark:border-gray-700">
                                                         <td class="px-6 py-4">
                                                             <button 
@@ -112,34 +117,7 @@
                                                                 @endif
                                                             </p>
                                                         </td>
-                                                        <td class="px-6 py-4">
-                                                            @php
-                            $statusColors = [
-                                'cancel' => 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300',
-                                'pending' => 'bg-orange-100 text-orange-700 dark:bg-orange-800 dark:text-orange-300',
-                                'started' => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-                                'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-                            ];
-                        @endphp
-                        @if($attempt->data_status=='pending')
-                                                            <select 
-                                class="text-xs px-1.5 py-0.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
-                                name="data_status"
-                            >
-                                                                @foreach(\App\Models\UserExam::STATUSES as $key => $label)
-                                                                <option value="{{ $key }}" {{ $attempt->
-                                                                    data_status === $key ? 'selected' : '' }}>
-                                        {{ $label }}
-                                                                </option>
-                                                                @endforeach
-                                                            </select>
-                                                            @else
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$attempt->
-                                                                data_status] ?? 'bg-gray-200 text-gray-800' }}">
-                            {{ ucfirst($attempt->data_status) }}
-                                                            </span>
-                                                            @endif
-                                                        </td>
+                                                        
                                                         <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400">
                                                             {{ $attempt->attempts_used }}
                                                         </td>
@@ -151,6 +129,133 @@
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}
+                                                        </td>
+                                                        <td class="px-6 py-4 text-right" x-data="{ openEdit: false, openDelete: false }">
+                                                            <!-- Edit Button -->
+                                                            <button 
+                                                                @click="openEdit = true"
+                                                                class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-blue-800 transition"
+                                                                title="Edit Active & End Dates"
+                                                            >
+                                                                <x-heroicon-o-pencil-square class="w-5 h-5" />
+                                                            </button>
+
+                                                            <!-- Delete Button -->
+                                                            <button 
+                                                                @click="openDelete = true"
+                                                                class="inline-flex items-center px-2 py-1 text-red-600 hover:text-red-800 transition"
+                                                                title="Remove Exam Attempt"
+                                                            >
+                                                                <x-heroicon-o-trash class="w-5 h-5" />
+                                                            </button>
+
+                                                            <!-- ===== Edit Modal ===== -->
+                                                            <div 
+                                                                x-show="openEdit"
+                                                                x-cloak
+                                                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                                            >
+                                                                <div 
+                                                                    @click.away="openEdit = false"
+                                                                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-6"
+                                                                >
+                                                                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                                                                        Edit Exam Dates — {{ $attempt->exam->title }}
+                                                                    </h2>
+
+                                                                    <form 
+                                                                        action="{{ route('admin.users.update-exam', $attempt->id) }}" 
+                                                                        method="POST"
+                                                                    >
+                                                                        @csrf
+                                                                        @method('PUT')
+
+                                                                        <div class="space-y-4">
+                                                                            <div>
+                                                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                                    Active Date
+                                                                                </label>
+                                                                                <input 
+                                                                                    type="datetime-local" 
+                                                                                    name="active_date"
+                                                                                    value="{{ $attempt->active_date ? $attempt->active_date->format('Y-m-d\TH:i') : '' }}"
+                                                                                    class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                                                                                    required
+                                                                                />
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                                    End Date
+                                                                                </label>
+                                                                                <input 
+                                                                                    type="datetime-local" 
+                                                                                    name="end_date"
+                                                                                    value="{{ $attempt->end_date ? $attempt->end_date->format('Y-m-d\TH:i') : '' }}"
+                                                                                    class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                                                                                    required
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="mt-6 flex justify-end gap-2">
+                                                                            <button 
+                                                                                type="button"
+                                                                                @click="openEdit = false"
+                                                                                class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                                                            >
+                                                                                Cancel
+                                                                            </button>
+                                                                            <button 
+                                                                                type="submit"
+                                                                                class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                                                                            >
+                                                                                Save Changes
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- ===== Delete Confirmation Modal ===== -->
+                                                            <div 
+                                                                x-show="openDelete"
+                                                                x-cloak
+                                                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                                            >
+                                                                <div 
+                                                                    @click.away="openDelete = false"
+                                                                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-sm p-6"
+                                                                >
+                                                                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                                                                        Remove Exam Attempt
+                                                                    </h2>
+                                                                    <p class="text-gray-600 dark:text-gray-300 mb-5">
+                                                                        Are you sure you want to remove <b>{{ $attempt->exam->title }}</b> from this user?
+                                                                    </p>
+
+                                                                    <form action="{{ route('admin.users.remove-exam', $attempt->id) }}" method="POST">
+                                                                        @csrf
+                                                                        @method('DELETE')
+
+                                                                        <div class="flex justify-end gap-2">
+                                                                            <button 
+                                                                                type="button"
+                                                                                @click="openDelete = false"
+                                                                                class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                                                            >
+                                                                                Cancel
+                                                                            </button>
+                                                                            <button 
+                                                                                type="submit"
+                                                                                class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                                                                            >
+                                                                                Yes, Remove
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     {{-- Expanded Section: Itemized Responses --}}
@@ -249,6 +354,7 @@
                                 </div>
                                 @endif
                             </div>
+                            
                             <script>
                                 function toggleAccordion(id) {
         const contentRow = document.getElementById(`content-${id}`);

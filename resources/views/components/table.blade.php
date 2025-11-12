@@ -78,7 +78,11 @@
                                 <a href="{{ route($actions['show'], $item->id) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-blue-600 hover:bg-blue-100 rounded-full"
                                    title="View">
-                                    <x-heroicon-o-eye class="w-4 h-4" />
+                                   @if($actions['show']=='admin.users.show')
+                                        <x-heroicon-o-folder-plus class="w-4 h-4" />
+                                    @else
+                                        <x-heroicon-o-eye class="w-4 h-4" />
+                                    @endif
                                 </a>
                             @endif
 

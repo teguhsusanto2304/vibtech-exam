@@ -50,6 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/users/{id}/edit', [UserController::class,'edit'])->name('admin.users.edit');
     Route::delete('/admin/users/{id}/destroy', [UserController::class,'destroy'])->name('admin.users.destroy');
     Route::get('/admin/users/{id}/status', [UserController::class, 'toggleStatus'])->name('admin.users.status');
+    Route::put('/admin/users/exam/{id}/update-exam', [UserController::class, 'updateExam'])
+    ->name('admin.users.update-exam');
+    Route::delete('/admin/users/{id}/remove-exam', [UserController::class, 'removeExam'])->name('admin.users.remove-exam');
+
 
     Route::get('/admin/exams', [ExamController::class,'index'])->name('admin.exams');
     Route::get('/admin/exams/create', [ExamController::class,'create'])->name('admin.exams.create');
