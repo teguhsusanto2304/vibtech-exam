@@ -30,7 +30,7 @@ Route::post('/login', [ExamineeController::class, 'login'])->name('login.submit'
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
-    Route::post('/admin/dologin', [AdminController::class,'generalLogin'])->name('admin.dologin');
+    Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
     
 });
 
@@ -80,3 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/question-banks/{id}/update', [QuestionController::class,'update'])->name('admin.question-banks.update');
     Route::delete('/admin/question-banks/{id}/destroy', [QuestionController::class,'destroy'])->name('admin.question-banks.destroy');
 });
+
+Route::get('/portal/{any?}', function () {
+    return view('spa');
+})->where('any', '.*')->name('student.portal');

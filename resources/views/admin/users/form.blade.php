@@ -54,7 +54,7 @@
             </div>
 
             <!-- Status -->
-            <div>
+            <div style="display: none;">
                 <label for="data_status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select id="data_status" name="data_status"
                         class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
@@ -67,7 +67,7 @@
             </div>
 
             <div>
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select id="role" name="role"
                         class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
                     <option value="">Choose Role</option>

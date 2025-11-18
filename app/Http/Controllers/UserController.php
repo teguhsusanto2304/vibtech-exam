@@ -127,7 +127,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $pageTitle='Assign a examination';
-        $exams = Exam::all();
+        $exams = Exam::where('data_status','publish')->get();
         return view('admin.users.assign_exam', compact('pageTitle','user','exams'));
     }
 

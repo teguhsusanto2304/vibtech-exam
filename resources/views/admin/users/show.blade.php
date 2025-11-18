@@ -43,13 +43,38 @@
                                         <h2 class="text-[#343A40] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
                                             Examination Attempt
                                         </h2>
-                                        <a href="{{ route('admin.users.assign-exam',['id'=>
-                                            $user->id]) }}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary dark:bg-primary-700 text-white dark:text-blue-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 dark:hover:bg-primary-600">
-                                            <x-heroicon-o-folder-plus class="w-5 h-5 bold mr-1" />
-                                            <span class="truncate">
-                                                Add Exam
-                                            </span>
-                                        </a>
+                                        @php
+                                        // Tentukan KONDISI Anda di sini. 
+                                        // Contoh: Tombol dinonaktifkan jika attempts_used sudah mencapai batas 3.
+                                        $canAssignExam = ($user->attempts_used < 3); // Ganti dengan logika kondisi Anda
+                                        
+                                        // Tentukan URL tujuan (jika dinonaktifkan, set ke '#')
+                                        $linkUrl = $canAssignExam 
+                                            ? route('admin.users.assign-exam', ['id' => $user->id]) 
+                                            : '#';
+                                        
+                                        // Tentukan class Tailwind untuk status disabled
+                                        $disabledClasses = 'opacity-50 pointer-events-none cursor-not-allowed';
+                                        
+                                        // Tentukan class yang akan ditambahkan secara bersyarat
+                                        $additionalClasses = $canAssignExam ? '' : $disabledClasses;
+
+                                        // Ganti class hover:bg-blue-700 karena kita tidak ingin ada efek hover saat disabled
+                                        $baseClasses = 'flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary dark:bg-primary-700 text-white dark:text-blue-200 text-sm font-bold leading-normal tracking-[0.015em]';
+                                        
+                                        // Gabungkan kelas dasar dan kelas bersyarat
+                                        $finalClasses = $baseClasses . ' ' . $additionalClasses . ' ' . ($canAssignExam ? 'hover:bg-blue-700 dark:hover:bg-primary-600' : '');
+
+                                    @endphp
+
+                                    <a href="{{ $linkUrl }}" class="
+                                        {{ $finalClasses }}
+                                    ">
+                                        <x-heroicon-o-folder-plus class="w-5 h-5 bold mr-1" />
+                                        <span class="truncate">
+                                            Add Exam
+                                        </span>
+                                    </a>
                                     </div>
                                     <!-- Data Table (Attempt History) -->
                                         <div class="overflow-x-auto bg-white dark:bg-[#182431] rounded-xl border border-[#E0E0E0] dark:border-gray-700">
@@ -102,13 +127,13 @@
                                                         <td class="px-6 py-4 font-medium text-[#343A40] dark:text-white">
                                                             {{ $attempt->exam->title }}
                                                             <p>
-                                                                @if($attempt->end_date)
+                                                                @if($attempt->started_at)
                                                                 <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
-                                                                    {{ $attempt->active_date->format('d-M-Y H:i') }}
+                                                                    {{ $attempt->started_at->format('d-M-Y H:i') }}
                                                                 </span>
                                                                 -
                                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
-                                                                    {{ $attempt->end_date->format('d-M-Y H:i') }}
+                                                                    {{ $attempt->finished_at->format('d-M-Y H:i') }}
                                                                 </span>
                                                                 @else
                                                                 <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
@@ -121,16 +146,42 @@
                                                         <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400">
                                                             {{ $attempt->attempts_used }}
                                                         </td>
-                                                        <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400">
+                                                        <td class="px-6 py-4 font-medium text-green-600 dark:text-green-400 text-center">
                                                             {{ $attempt->data_score }}%
+                                                            @php
+                                                            // Tentukan kelas dasar untuk badge (ukuran, padding, rounded)
+                                                            $baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider';
+                                                            
+                                                            // Tentukan kelas warna berdasarkan status
+                                                            $colorClasses = match ($attempt->data_status) {
+                                                                'passed' => 'bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100',
+                                                                'failed' => 'bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100',
+                                                                'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
+                                                                default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100', // Default atau status tidak dikenal
+                                                            };
+                                                            
+                                                            // Gabungkan semua kelas
+                                                            $badgeClasses = $baseClasses . ' ' . $colorClasses;
+                                                        @endphp
+
+                                                        <p class="{{ $badgeClasses }}">
+                                                            {{ $attempt->data_status }}
+                                                        </p>
                                                         </td>
                                                         <td class="px-6 py-4">
-                                                            
+                                                            @php
+                                                            $start = $attempt->started_at;
+                                                            $end = $attempt->finished_at;
+
+                                                            $duration = $start->diff($end);
+                                                            @endphp
+                                                            {{ $duration }}
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}
                                                         </td>
                                                         <td class="px-6 py-4 text-right" x-data="{ openEdit: false, openDelete: false }">
+                                                            @if($attempt->data_status==='pending')
                                                             <!-- Edit Button -->
                                                             <button 
                                                                 @click="openEdit = true"
@@ -256,6 +307,7 @@
                                                                     </form>
                                                                 </div>
                                                             </div>
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                     {{-- Expanded Section: Itemized Responses --}}
@@ -296,15 +348,15 @@
                                         ->firstWhere('examQuestion.question_id', $question->id ?? null);
                                 @endphp
                                                                                 <tr class="border-b border-[#E0E0E0] dark:border-gray-700">
-                                                                                    <td class="px-2 py-3 font-medium">
-                                                                                        {{ $index + 1 }}
+                                                                                    <td class="px-2 py-3">
+                                                                                        {{ $index + 1 }} {{ $question->question_stem }}
                                                                                     </td>
                                                                                     <td class="px-2 py-3 
                                         {{ optional($userAnswer)->
                                                                                         is_correct ? 'text-green-600' : 
                                         ($userAnswer ? 'text-red-600 dark:text-red-400' : 'text-gray-400') }}">
                                         @if($userAnswer)
-                                            Option {{ $userAnswer->user_option }}
+                                            {{ $userAnswer->user_option }}
                                         @else
                                                                                         <em>
                                                                                             No answer
@@ -312,8 +364,9 @@
                                                                                         @endif
                                                                                     </td>
                                                                                     <td class="px-2 py-3">
-                                                                                        Option {{ $question->correct_option ?? '—' }}
+                                                                                        {{ $question->{'option_' . strtolower($question->correct_option)} ?? '-' }}
                                                                                     </td>
+
                                                                                     <td class="px-2 py-3 text-right">
                                                                                         @if($userAnswer)
                                             @if($userAnswer->is_correct)

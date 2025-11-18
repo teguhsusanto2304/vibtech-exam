@@ -47,7 +47,7 @@ class ExamineeController extends Controller
         }
 
         // ✅ If user has assigned exams, continue login
-        return redirect()->intended(route('dashboard'))
+        return redirect()->intended(route('admin.dashboard'))
             ->with('success', 'Welcome back!');
     }
 
@@ -57,7 +57,7 @@ class ExamineeController extends Controller
     ])->onlyInput('email');
 }
 
-    public function login(Request $request)
+    public function loginxx(Request $request)
     {
         // Validate form input
         $credentials = $request->validate([
@@ -86,7 +86,7 @@ class ExamineeController extends Controller
         }
 
             // Redirect to intended page or dashboard
-            return redirect()->intended(route('dashboard'))->with('success', 'Welcome back!');
+            return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome back!');
         }
 
         // Failed login
@@ -108,7 +108,6 @@ class ExamineeController extends Controller
     public function dashboard()
     {
         $exams  = UserExam::with('exam')->where('user_id',auth()->user()->id)->get();
-        
         $arrExam = [];
         foreach ($exams as $row) {
             $arrExam['title'] = $row->exam->title; // Access the related Exam model
@@ -124,7 +123,6 @@ class ExamineeController extends Controller
                 'exam_id'       => $row->exam->id,
             ]);
         }
-        
         return view('examinee.dashboard',compact('exams','arrExam'));
     }
 

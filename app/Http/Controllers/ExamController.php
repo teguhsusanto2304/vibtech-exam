@@ -196,6 +196,13 @@ class ExamController extends Controller
     public function examUpdateStatus($id,Request $request)
     {
         $exam = Exam::findOrFail($id);
+        
+        // Check if exam has questions before activating
+        if ($request->data_status !== 'pending' && $exam->examQuestions()->count() === 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot change status — this exam has no questions assigned.');
+        }
         $exam->data_status = $request->data_status;
         $exam->save();
         $status = $exam->data_status.''.($exam->data_status=='pending'?'':'ed');
