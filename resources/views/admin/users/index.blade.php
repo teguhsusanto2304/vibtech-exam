@@ -13,6 +13,14 @@
     </x-alert-message>
 @endif
 
+@if (session('error'))
+    <x-alert-message type="error">
+        <ul class="list-disc list-inside space-y-1 text-sm">
+            <li>{{ session('error') }}</li>
+        </ul>
+    </x-alert-message>
+@endif
+
 <main>
     <div class="w-full p-3 bg-background-light dark:bg-background-dark sticky top-0 z-10 border-b border-gray-200 dark:border-gray-800">
         <div class="flex items-center gap-4">

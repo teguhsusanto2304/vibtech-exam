@@ -29,7 +29,10 @@ Route::post('/login', [ExamineeController::class, 'login'])->name('login.submit'
     
 
 Route::middleware('guest')->group(function () {
-    Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
+    //Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
+    Route::get('/admin/login', function () {
+    return redirect()->route('login'); 
+})->name('admin.login');
     Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
     
 });

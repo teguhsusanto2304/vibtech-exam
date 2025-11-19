@@ -127,13 +127,13 @@
                                                         <td class="px-6 py-4 font-medium text-[#343A40] dark:text-white">
                                                             {{ $attempt->exam->title }}
                                                             <p>
-                                                                @if($attempt->started_at)
+                                                                @if($attempt->active_date)
                                                                 <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
-                                                                    {{ $attempt->started_at->format('d-M-Y H:i') }}
+                                                                    {{ $attempt->active_date->format('d-M-Y H:i')  ?? '-' }}
                                                                 </span>
                                                                 -
                                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
-                                                                    {{ $attempt->finished_at->format('d-M-Y H:i') }}
+                                                                    {{ $attempt->end_date ? $attempt->end_date->format('d-M-Y H:i') : '-' }}
                                                                 </span>
                                                                 @else
                                                                 <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
@@ -183,7 +183,7 @@
                                                                 @endphp
                                                                 
                                                                 {{-- Format output durasi. Contoh: 1 jam 30 menit --}}
-                                                                {{ $duration->format('%H jam %I menit %S detik') }}
+                                                                {{ $duration->format('%H Hours %I minutes %S seconds') }}
                                                             @elseif (isset($start) && !isset($end))
                                                                 {{-- Jika ujian dimulai tapi belum selesai --}}
                                                                 <span class="text-yellow-600 font-semibold">On Going</span>
@@ -341,7 +341,10 @@
                                                                             <thead class="text-xs text-gray-500 dark:text-gray-400">
                                                                                 <tr>
                                                                                     <th class="px-2 py-2 font-medium">
-                                                                                        Question #
+                                                                                        #
+                                                                                    </th>
+                                                                                    <th class="px-2 py-2 font-medium">
+                                                                                        Question
                                                                                     </th>
                                                                                     <th class="px-2 py-2 font-medium">
                                                                                         User's Answer
@@ -364,7 +367,10 @@
                                 @endphp
                                                                                 <tr class="border-b border-[#E0E0E0] dark:border-gray-700">
                                                                                     <td class="px-2 py-3">
-                                                                                        {{ $index + 1 }} {{ $question->question_stem }}
+                                                                                        {{ $index + 1 }} 
+                                                                                    </td>
+                                                                                    <td class="px-2 py-3">
+                                                                                        {{ $question->question_stem }}
                                                                                     </td>
                                                                                     <td class="px-2 py-3 
                                         {{ optional($userAnswer)->

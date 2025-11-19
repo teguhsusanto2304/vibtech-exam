@@ -63,14 +63,14 @@
                         @if(isset($actions['status']))
                             <a href="{{ route($actions['status'], $item->id) }}"
                             class="inline-flex items-center justify-center w-8 h-8 
-                                    {{ $item->status === 'active' ? 'text-green-600 hover:bg-green-100' : 'text-gray-500 hover:bg-gray-100' }}
+                                    {{ $item->data_status === 'active' ? 'text-red-600 hover:bg-red-100' : 'text-green-500 hover:bg-green-100' }}
                                     rounded-full transition"
-                            title="{{ $item->status === 'active' ? 'Deactivate User' : 'Activate User' }}">
+                            title="{{ $item->data_status === 'active' ? 'Deactivate User' : 'Activate User' }}">
                             
                             @if($item->data_status === 'active')
-                                <x-heroicon-o-eye class="w-4 h-4" />   {{-- Active → show open eye --}}
+                                <x-heroicon-o-x-mark class="w-4 h-4" />   {{-- Active → show open eye --}}
                             @else
-                                <x-heroicon-o-eye-slash class="w-4 h-4" /> {{-- Inactive → show eye with slash --}}
+                                <x-heroicon-o-arrow-path-rounded-square class="w-4 h-4" /> {{-- Inactive → show eye with slash --}}
                             @endif
                             </a>
                         @endif   
@@ -94,7 +94,7 @@
                                 </a>
                             @endif
 
-                            @if(isset($actions['delete']))
+                            @if(isset($actions['delete']) && $item->data_status != 'active')
                                 <form action="{{ route($actions['delete'], $item->id) }}"
                                       method="POST" 
                                       class="inline needs-confirmation" 

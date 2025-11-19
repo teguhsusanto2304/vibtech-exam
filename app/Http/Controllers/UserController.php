@@ -135,9 +135,23 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'exam_id' => 'required|string|max:255',
-            'active_date' => 'required|string',
-            'end_date' => 'required|string'
+            'active_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:active_date',
         ]);
+
+        // Check for date overlap with other schedules
+        $conflict = UserExam::where(['user_id' => $userId])
+            ->where(function ($query) use ($validated) {
+                $query->where('active_date', '<=', $validated['end_date'])
+                    ->where('end_date', '>=', $validated['active_date']);
+            })
+            ->exists();
+
+        if ($conflict) {
+            return back()->withErrors([
+                'active_date' => 'The selected date range conflicts with an existing exam schedule.',
+            ])->withInput();
+        }
 
         $exam = Exam::find($request->exam_id);
 
@@ -164,6 +178,13 @@ class UserController extends Controller
     public function toggleStatus($id)
     {
         $user = User::findOrFail($id);
+        if($user->role==='admin')
+        {
+            if( User::where('role','admin')->count() === 1 )
+            {
+                return back()->with('error', "User status cannot changed to Inactive.");
+            }
+        }
 
         // Toggle status
         $user->data_status = $user->data_status === 'active' ? 'inactive' : 'active';
