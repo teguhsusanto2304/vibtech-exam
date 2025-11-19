@@ -24,7 +24,49 @@ class AdminController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('admin/dashboard')->with('success', 'Welcome back!');
+            if (Auth::user()->data_status=='inactive' && Auth::user()->rolee=='user') {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You are not authorized to log in because you have no active on your account.',
+                    ])->onlyInput('email');
+                
+            }
+            if(Auth::user()->role=='admin')
+            {
+                dd(Auth::user()->role);
+                return redirect()->intended('admin/dashboard')->with('success', 'Welcome back!');
+            } else if(Auth::user()->role=='userx') {
+                $hasExam = UserExam::with('exam')->where('user_id', Auth::user()->id)
+                    ->whereDate('active_date', '<=', now())
+                    ->whereDate('end_date', '>=', now())
+                    ->first(); // ✅ get the model, not a boolean
+
+                if (! $hasExam) {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You are not authorized to log in because you have no active examination.',
+                    ])->onlyInput('email');
+                
+                }
+
+                if ((int) $hasExam->attempts_used === 3) {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You have reached the maximum number of exam attempts. Your account has been locked from further exams.',
+                    ])->onlyInput('email');
+                } 
+                else if ((int) $hasExam->attempts_used < 3 && $hasExam->scores > $hasExam->exam->pass_mark) {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You have already passed the exam successfully. Further attempts are not allowed.',
+                    ])->onlyInput('email');
+                }
+
+
+
+                return redirect()->intended('');
+            }
+            
         }
 
         return back()->withErrors([
@@ -48,17 +90,15 @@ class AdminController extends Controller
             'password' => ['required'],
         ]);
 
-        dd('test');
-
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            /**if (Auth::user()->data_status=='inactive' && Auth::user()->rolee=='user') {
+            if (Auth::user()->data_status=='inactive' && Auth::user()->rolee=='user') {
                     Auth::logout();
                     return back()->withErrors([
                         'email' => 'You are not authorized to log in because you have no active on your account.',
                     ])->onlyInput('email');
                 
-            }**/
+            }
             if(Auth::user()->role=='admin')
             {
                 dd(Auth::user()->role);
