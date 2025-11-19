@@ -161,7 +161,6 @@ class AdminController extends Controller
             }
             if(Auth::user()->role=='admin')
             {
-                dd(Auth::user()->role);
                 return redirect()->intended('admin/users')->with('success', 'Welcome back!');
             } else if(Auth::user()->role=='userx') {
                 $hasExam = UserExam::with('exam')->where('user_id', Auth::user()->id)
