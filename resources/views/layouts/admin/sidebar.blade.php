@@ -33,7 +33,7 @@
 <span class="text-sm font-semibold">Questions Bank</span>
 </a>
 </li>
-<li>
+<li style="display: none;">
 <a class="flex items-center gap-3 rounded-lg px-3 py-2 {{ Request::routeIs('admin.dashboard') 
               ? 'bg-primary/10 text-primary dark:text-primary' 
               : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary' }} dark:text-primary transition-colors" href="{{ route('admin.dashboard') }}">
