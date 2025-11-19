@@ -178,8 +178,15 @@ class ExamController extends Controller
         $score = $userExam->exam->questions > 0 
             ? round(($correctCount / $userExam->exam->questions) * 100)
             : 0;
+        if ($userExam->attempts_used < 3)
+            {
+                $status = $score >= $userExam->exam->pass_mark ? 'passed' : 'pending';
+            } else {
+                $status = $score >= $userExam->exam->pass_mark ? 'passed' : 'cancel';
+            }
+        
         $userExam->scores = $score;
-        $userExam->data_status = $score >= $userExam->exam->pass_mark ? 'passed' : 'cancel';
+        $userExam->data_status = $status;
         $userExam->finished_at = now();
         $userExam->save();
 

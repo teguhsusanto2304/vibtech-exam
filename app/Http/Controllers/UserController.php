@@ -180,7 +180,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         if($user->role==='admin')
         {
-            if( User::where('role','admin')->count() === 1 )
+            if( User::where(['role'=>'admin','data_status'=>'active'])->count() === 1 )
             {
                 return back()->with('error', "User status cannot changed to Inactive.");
             }

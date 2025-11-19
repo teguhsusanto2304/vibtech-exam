@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\UserExam;
 use Illuminate\Support\Str;
 
+//php artisan optimize:clear
 class AuthController extends Controller
 {
     public function login(Request $request)
