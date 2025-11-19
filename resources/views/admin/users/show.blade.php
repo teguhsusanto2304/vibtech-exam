@@ -186,10 +186,10 @@
                                                                 {{ $duration->format('%H jam %I menit %S detik') }}
                                                             @elseif (isset($start) && !isset($end))
                                                                 {{-- Jika ujian dimulai tapi belum selesai --}}
-                                                                <span class="text-yellow-600 font-semibold">Berlangsung</span>
+                                                                <span class="text-yellow-600 font-semibold">On Going</span>
                                                             @else
                                                                 {{-- Jika ujian belum dimulai sama sekali --}}
-                                                                <span class="text-gray-500">Belum Dimulai</span>
+                                                                <span class="text-gray-500">Not Started</span>
                                                             @endif
                                                         </td>
                                                         <td class="px-6 py-4">
