@@ -170,12 +170,27 @@
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             @php
-                                                            $start = $attempt->started_at;
-                                                            $end = $attempt->finished_at;
-
-                                                            $duration = $start->diff($end);
+                                                                $start = $attempt->started_at;
+                                                                $end = $attempt->finished_at;
                                                             @endphp
-                                                            {{ $duration }}
+
+                                                            {{-- Cek apakah kedua nilai (start dan end) ada --}}
+                                                            @if (isset($start) && isset($end))
+                                                                @php
+                                                                    // Karena ini adalah kolom timestamp dari Eloquent, mereka seharusnya sudah berupa objek Carbon.
+                                                                    // Jika tidak, Anda mungkin perlu menggunakan Carbon::parse($start)
+                                                                    $duration = $start->diff($end);
+                                                                @endphp
+                                                                
+                                                                {{-- Format output durasi. Contoh: 1 jam 30 menit --}}
+                                                                {{ $duration->format('%H jam %I menit %S detik') }}
+                                                            @elseif (isset($start) && !isset($end))
+                                                                {{-- Jika ujian dimulai tapi belum selesai --}}
+                                                                <span class="text-yellow-600 font-semibold">Berlangsung</span>
+                                                            @else
+                                                                {{-- Jika ujian belum dimulai sama sekali --}}
+                                                                <span class="text-gray-500">Belum Dimulai</span>
+                                                            @endif
                                                         </td>
                                                         <td class="px-6 py-4">
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}

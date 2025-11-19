@@ -11,8 +11,8 @@ class CorsMiddleware
     {
         // 1. Definisikan Origins yang Diizinkan
         $allowedOrigins = [
-            'http://192.168.1.233:8282', 
-            'http://192.168.1.233:3000',
+            'http://192.168.100.46:8000', 
+            'http://192.168.100.46:3000',
             // Tambahkan origin lain yang dibutuhkan di sini
         ];
         
