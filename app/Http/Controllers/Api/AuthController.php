@@ -65,12 +65,18 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-        $exams  = UserExam::with('exam')->where('user_id', auth()->id())->get(); 
-        $exams->finished_at = date('Y-m-d H:i:s');
-        $exams->save();
+        //$request->user()->tokens()->delete();
+        //$exams  = UserExam::with('exam')->where('user_id', auth()->id())->get(); 
+        //$exams->finished_at = now();
+        //$exams->save();
 
+        if ($request->user()) {
+        // Hapus token jika user ditemukan
+            $request->user()->currentAccessToken()->delete();
+        
         return response()->json(['message' => 'Logged out']);
+        }
+        return response()->json(['message' => 'Unauthorized / No active session'], 401); 
     }
 
     public function logCheat(Request $request, $examId)
