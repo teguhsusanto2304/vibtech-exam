@@ -194,6 +194,16 @@ class UserController extends Controller
         return back()->with('success', "User status changed to {$user->data_status}.");
     }
 
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->data_status = $user->data_status === 'delete';
+        $user->save();
+
+        // Optional: add flash message
+        return back()->with('success', "User has deleted.");
+    }
+
     public function updateExam(Request $request, $id)
     {
         $request->validate([
