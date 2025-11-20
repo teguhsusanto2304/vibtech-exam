@@ -17,8 +17,15 @@ class UserController extends Controller
     // Search
     if ($request->filled('search')) {
         $query->where(function ($q) use ($request) {
-            $q->where('name', 'like', "%{$request->search}%")
-              ->orWhere('email', 'like', "%{$request->search}%");
+            //$q->where('name', 'like', "%{$request->search}%")
+              //->orWhere('email', 'like', "%{$request->search}%");
+            if($request->filled('filterBy'))
+            {
+                $q->where($request->get('filterBy'),'like',"%{$request->search}%");
+            } else {
+                $q->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%");
+            }
         });
     }
 
@@ -45,7 +52,9 @@ class UserController extends Controller
         return view('admin.users.table', compact('users'))->render();
     }
 
-    return view('admin.users.index', compact('users'));
+    $pageTitle = 'Account Management';
+
+    return view('admin.users.index', compact('users','pageTitle'));
 }
 
 

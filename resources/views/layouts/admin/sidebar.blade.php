@@ -14,7 +14,7 @@
               ? 'bg-primary/10 text-primary dark:text-primary' 
               : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary' }} dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="{{ route('admin.users') }}">
 <span class="material-symbols-outlined text-xl">group</span>
-<span class="text-sm font-semibold">Users List</span>
+<span class="text-sm font-semibold">Account Management</span>
 </a>
 </li>
 <li>
@@ -22,7 +22,7 @@
               ? 'bg-primary/10 text-primary dark:text-primary' 
               : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary' }} dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="{{ route('admin.exams') }}">
 <span class="material-symbols-outlined text-xl">settings</span>
-<span class="text-sm font-semibold">Exam Settings</span>
+<span class="text-sm font-semibold">Exam Management</span>
 </a>
 </li>
 <li>
@@ -30,7 +30,7 @@
               ? 'bg-primary/10 text-primary dark:text-primary' 
               : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary' }} dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="{{ route('admin.question-banks') }}">
 <span class="material-symbols-outlined text-xl">quiz</span>
-<span class="text-sm font-semibold">Questions Bank</span>
+<span class="text-sm font-semibold">Question Management</span>
 </a>
 </li>
 <li style="display: none;">

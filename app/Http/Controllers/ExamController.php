@@ -9,7 +9,7 @@ use App\Models\Question;
 
 class ExamController extends Controller
 {
-    public function index(Request $request)
+    public function indexOld(Request $request)
     {
         $pageTitle ='Exam Management';
         // Search filter
@@ -45,6 +45,95 @@ class ExamController extends Controller
         }       
 
         return view('admin.exams.index', compact('exams','pageTitle','usersCount'));
+    }
+
+    public function index(Request $request)
+    {
+        $pageTitle ='Exam Management';
+        // Search filter
+        $search = $request->get('search');
+
+        $examsQuery1 = Exam::query()
+        ->with('examQuestions')
+        ->whereNot('data_status','inactive')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10)
+        ->appends(['search' => $search]);
+
+        $examsQuery = Exam::query();
+        if ($request->get('status') && in_array($request->status, ['publish','archived', 'draft'])) {
+            $examsQuery->where('data_status', $request->status);
+        } else {
+            $examsQuery->where('data_status', 'publish');
+        }
+
+        $exams = $examsQuery->paginate(10);
+
+        $published = Exam::query()
+        ->with('examQuestions')
+        ->whereNot('data_status','published')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10, ['*'], 'published')
+        ->appends(['search' => $search]);
+
+        $draft = Exam::query()
+        ->with('examQuestions')
+        ->whereNot('data_status','draft')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10, ['*'], 'draft')
+        ->appends(['search' => $search]);
+
+        $archived = Exam::query()
+        ->with('examQuestions')
+        ->whereNot('data_status','archived')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10, ['*'], 'archived')
+        ->appends(['search' => $search]);
+
+        $usersCount = Exam::query()
+    // Apply the search filter if a search term exists
+    ->when($search, function ($query, $search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        });
+    })
+    // Execute the query and return only the count
+    ->count();
+
+        // If AJAX request, return only the table partial
+        if ($request->ajax()) {
+            return view('admin.exams.table', compact(
+                'exams',
+                'pageTitle','usersCount','archived','published','draft'
+                ))->render();
+        }       
+
+        return view('admin.exams.index', compact('exams','pageTitle','usersCount','archived','published','draft'));
     }
 
     public function create(Request $request)

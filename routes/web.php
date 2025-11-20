@@ -12,7 +12,7 @@ Route::post('/ckeditor/upload', [CKEditorController::class, 'upload'])->name('ck
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [ExamineeController::class,'dashboard'])->name('dashboard');
+    //Route::get('/dashboard', [ExamineeController::class,'dashboard'])->name('dashboard');
     Route::get('/{examId}/start-exam', [ExamineeController::class,'startExam'])->name('start-exam');
     Route::get('/{examId}/complete-exam', [ExamineeController::class,'completeExam'])->name('complete-exam');
     Route::get('/{examId}/exam', [ExamineeController::class,'exam'])->name('exam');
@@ -23,19 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/done', [ExamineeController::class,'done'])->name('done');
     Route::post('/logout', [ExamineeController::class, 'logout'])->name('logout');
 });
-//Route::get('/', [ExamineeController::class, 'showLoginForm'])->name('login');
 Route::get('/', [AdminController::class,'login'])->name('login');
-Route::post('/login', [ExamineeController::class, 'login'])->name('login.submit');
     
-
-Route::middleware('guest')->group(function () {
-    //Route::get('/admin/login', [AdminController::class,'login'])->name('admin.login');
-    Route::get('/admin/login', function () {
-    return redirect()->route('login'); 
-})->name('admin.login');
-    Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
-    
-});
+Route::post('/admin/dologin', [AdminController::class,'dologin'])->name('admin.dologin');
 
 
 Route::middleware('auth')->group(function () {

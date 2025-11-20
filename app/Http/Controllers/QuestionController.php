@@ -9,7 +9,7 @@ class QuestionController extends Controller
 {
     public function index(Request $request)
     {
-        $pageTitle ='Question Bank Management';
+        $pageTitle =' Question Management';
         // Search filter
         $search = $request->get('search');
 
