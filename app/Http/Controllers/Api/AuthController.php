@@ -28,8 +28,8 @@ class AuthController extends Controller
 
         //$exams  = UserExam::with('exam')->where('user_id', auth()->id())->first(); 
         $exams = UserExam::with('exam')->where('user_id', Auth::user()->id)
-                    ->whereDate('active_date', '<=', now())
-                    ->whereDate('end_date', '>=', now())
+                    ->whereDate('active_date', '>=', now())
+                    ->whereDate('end_date', '<=', now())
                     ->first();
 
         if (!$exams) {
