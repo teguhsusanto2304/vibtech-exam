@@ -40,7 +40,7 @@
             </div>
 
             <!-- ➕ Create Button -->
-            <a href="{{ route('admin.users.create') }}"
+            <a href="{{ route('admin.exams.create') }}"
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2">
                 <span class="material-symbols-outlined">add</span>
                 <span class="truncate">Create New Exam</span>
