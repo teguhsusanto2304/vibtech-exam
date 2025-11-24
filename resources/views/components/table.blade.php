@@ -52,7 +52,12 @@
                                     <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">{{ ucfirst($value) }}</span>
                                 @endif
                             @else
-                                {{ Str::limit($value, $column['limit'] ?? 80) }}
+                                @if($column['field']==='question_stem' && !empty(data_get($item, 'image')))
+
+                                    <img src="{{ asset('storage/question-images/'.data_get($item, 'image')) }}" class="w-16 h-auto rounded-md">
+                                @endif
+                                    {{ Str::limit($value, $column['limit'] ?? 80) }}
+                                
                             @endif
                         </td>
                     @endforeach
@@ -61,6 +66,7 @@
                     @if (!empty($actions))
                         <td class="border px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white" >
                         @if(isset($actions['status']))
+                            
                             <a href="{{ route($actions['status'], $item->id) }}"
                             class="inline-flex items-center justify-center w-8 h-8 
                                     {{ $item->data_status === 'active' ? 'text-red-600 hover:bg-red-100' : 'text-green-500 hover:bg-green-100' }}
@@ -95,13 +101,19 @@
                             @endif
 
                             @if(isset($actions['delete']) && $item->data_status != 'active')
-                                <form action="{{ route($actions['delete'], $item->id) }}"
-                                      method="POST" 
-                                      class="inline needs-confirmation" 
-                                      data-action="Are you sure you want to delete this item?">
+                                <form 
+                                    id="data-status-form-{{ $item->id }}" 
+                                    action="{{ route($actions['delete'], ['id'=>$item->id]) }}" 
+                                    method="POST" 
+                                    style="display: inline;" 
+                                    data-action="DELETE this data immediately"
+                                >
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit"  class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
+                                    @method('PUT')
+                                    <input type="hidden" name="data_status" value="inactive">
+                                    <button type="button" 
+                                            onclick="triggerConfirmModal('data-status-form-{{ $item->id }}')" {{-- <--- ADDED JS CALL --}}
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
                                             title="Delete">
                                         <x-heroicon-o-trash class="w-4 h-4" />
                                     </button>

@@ -47,7 +47,8 @@ class Question extends Model
         'option_d',
         'correct_option',
         'explanation',
-        'data_status'
+        'data_status',
+        'image',
     ];
 
     /**
@@ -73,4 +74,12 @@ class Question extends Model
                     ->withTimestamps()
                     ->withPivot('order');
     }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image 
+            ? asset('storage/question-images/' . $this->image)
+            : null;
+    }
+
 }

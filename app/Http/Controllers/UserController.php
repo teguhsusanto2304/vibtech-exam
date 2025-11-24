@@ -7,55 +7,90 @@ use App\Models\User;
 use App\Models\UserExam;
 use App\Models\Exam;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-{
-    $query = User::query();
+    public function updatePassword(Request $request) 
+    {
+        // Validate fields
+        $request->validate([
+            'current_password' => ['required'],
+            'new_password' => [
+                'required',
+                'confirmed', // requires input "new_password_confirmation"
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
+        ],[
+            'new_password.confirmed' => 'New password and confirmation do not match.',
+            'new_password.required' => 'The new password field is required.'
+        ]);
 
-    // Search
-    if ($request->filled('search')) {
-        $query->where(function ($q) use ($request) {
-            //$q->where('name', 'like', "%{$request->search}%")
-              //->orWhere('email', 'like', "%{$request->search}%");
-            if($request->filled('filterBy'))
-            {
-                $q->where($request->get('filterBy'),'like',"%{$request->search}%");
-            } else {
-                $q->where('name', 'like', "%{$request->search}%")
-                ->orWhere('email', 'like', "%{$request->search}%");
-            }
-        });
-    }
+        $user = Auth::user();
 
-    // Role filter
-    if ($request->filled('role') && in_array($request->role, ['admin', 'user'])) {
-        $query->where('role', $request->role);
-    }
-
-    // Status filter (active/inactive)
-    if ($request->filled('status') && in_array($request->status, ['active', 'inactive'])) {
-        $query->where('data_status', $request->status);
-    }
-
-        if(!$request->filled('search') && !$request->filled('role'))
-        {
-            $query->where(['role'=>'admin','data_status'=>'active']);
+        // Verify current password
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
         }
 
+        // Save new password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
 
-
-    $users = $query->paginate(10);
-
-    if ($request->ajax()) {
-        return view('admin.users.table', compact('users'))->render();
+        return back()->with('success', 'Password updated successfully.');
     }
 
-    $pageTitle = 'Account Management';
+    public function index(Request $request)
+    {
+        $query = User::query();
 
-    return view('admin.users.index', compact('users','pageTitle'));
-}
+        // Search
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                //$q->where('name', 'like', "%{$request->search}%")
+                //->orWhere('email', 'like', "%{$request->search}%");
+                if($request->filled('filterBy'))
+                {
+                    $q->where($request->get('filterBy'),'like',"%{$request->search}%");
+                } else {
+                    $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%");
+                }
+            });
+        }
+
+        // Role filter
+        if ($request->filled('role') && in_array($request->role, ['admin', 'user'])) {
+            $query->where('role', $request->role);
+        }
+
+        // Status filter (active/inactive)
+        if ($request->filled('status') && in_array($request->status, ['active', 'inactive'])) {
+            $query->where('data_status', $request->status);
+        }
+
+            if(!$request->filled('search') && !$request->filled('role'))
+            {
+                $query->where(['role'=>'admin','data_status'=>'active']);
+            }
+
+
+
+        $users = $query->paginate(10);
+
+        if ($request->ajax()) {
+            return view('admin.users.table', compact('users'))->render();
+        }
+
+        $pageTitle = 'Account Management';
+
+        return view('admin.users.index', compact('users','pageTitle'));
+    }
 
 
 
@@ -106,7 +141,7 @@ class UserController extends Controller
 
         if ($request->filled('password')) {
         // Automatically hashes the password because we're using fill/update
-            $user->password = bcrypt($validated['password']); 
+            $validated['password'] = bcrypt($validated['password']);
             // You can also use: $validated['password'] = bcrypt($validated['password']);
         } else {
             // Remove the password key from the validated array so it's not set to null
@@ -205,9 +240,11 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->data_status = $user->data_status === 'delete';
-        $user->save();
+        $user = User::find($id);
+        if (!$user) {
+            return back()->withErrors('Error: User not found.');
+        }
+        $user->update(['data_status' => 'suspended']); // Correctly using 'deleted'
 
         // Optional: add flash message
         return back()->with('success', "User has deleted.");
@@ -235,6 +272,18 @@ class UserController extends Controller
         $attempt->delete();
 
         return redirect()->back()->with('success', 'Exam attempt removed successfully.');
+    }
+
+    public function profile()
+    {
+        $pageTitle='Profile';
+        return view('admin.profile',compact('pageTitle'));
+    }
+
+    public function password()
+    {
+        $pageTitle='Change Password';
+        return view('admin.password',compact('pageTitle'));
     }
 
 }

@@ -68,34 +68,100 @@
                     </td>
                     <!-- px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white z-10 -->
                     <td class="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white">
-
+                        @if($exam->data_status==='draft')
                         <a href="{{ route('admin.exams.questions',['id'=>$exam->id]) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-purple-600 hover:bg-purple-100 rounded-full"
                                    title="Question Manage">
                                     <x-heroicon-o-folder-plus class="w-4 h-4" />
                                 </a>
+                        @endif
                         <a href="{{ route('admin.exams.show',['id'=>$exam->id]) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-blue-600 hover:bg-blue-100 rounded-full"
                                    title="View">
                                     <x-heroicon-o-eye class="w-4 h-4" />
                                 </a>
+                                @if($exam->data_status==='publish')
+                                <form 
+                                    id="exam-status-form-{{ $exam->id }}" 
+                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    method="POST" 
+                                    style="display: inline;" 
+                                    data-action="DRAFT this exam immediately"
+                                >
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="data_status" value="draft">
+                                    <button type="button" 
+                                            onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
+                                            title="Publish">
+                                        <x-heroicon-o-lock-open class="w-4 h-4" />
+                                    </button>
+                                </form>
+                                @endif
+                                @if($exam->data_status==='draft')
+                                <form 
+                                    id="exam-status-form-{{ $exam->id }}" 
+                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    method="POST" 
+                                    style="display: inline;" 
+                                    data-action="PUBLISH this exam immediately"
+                                >
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="data_status" value="publish">
+                                    <button type="button" 
+                                            onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
+                                            class="inline-flex items-center justify-center w-8 h-8 text-green-600 hover:bg-green-100 rounded-full"
+                                            title="Publish">
+                                        <x-heroicon-o-lock-closed class="w-4 h-4" />
+                                    </button>
+                                </form>
+
                                 <a href="{{ route('admin.exams.edit',['id'=>$exam->id]) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-green-600 hover:bg-green-100 rounded-full"
                                    title="Edit">
                                     <x-heroicon-o-pencil class="w-4 h-4" />
                                 </a>
-        
-                                <form action="{{ route('admin.exams.destroy',['id'=>$exam->id]) }}"
-      method="POST" 
-      class="inline needs-confirmation" 
-      data-action="delete the exam '{{ $exam->title ?? $exam->id }}'"> @csrf
-    @method('DELETE')
-    
-    <button type="submit"  class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
-            title="Delete">
-        <x-heroicon-o-trash class="w-4 h-4" />
-    </button>
-</form>
+                                @endif
+                                @if($exam->data_status==='draft')
+                                <form 
+                                    id="exam-status-form-{{ $exam->id }}" 
+                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    method="POST" 
+                                    style="display: inline;" 
+                                    data-action="DELETE this exam immediately"
+                                >
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="data_status" value="archived">
+                                    <button type="button" 
+                                            onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
+                                            title="Delrtr">
+                                        <x-heroicon-o-trash class="w-4 h-4" />
+                                    </button>
+                                </form>
+                                @endif
+                                @if($exam->data_status==='archived')
+                                <form 
+                                    id="exam-status-form-{{ $exam->id }}" 
+                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    method="POST" 
+                                    style="display: inline;" 
+                                    data-action="DRAFT this exam immediately"
+                                >
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="data_status" value="draft">
+                                    <button type="button" 
+                                            onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
+                                            title="Restore">
+                                        <x-heroicon-o-arrow-path-rounded-square class="w-4 h-4" />
+                                    </button>
+                                </form>
+                                @endif
                                 
                     </td>
                 </tr>

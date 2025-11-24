@@ -13,7 +13,7 @@
     </x-alert>
 @endif
 <form action="{{ isset($question) ? route('admin.question-banks.update', ['id'=>$question->id]) : route('admin.question-banks.store') }}"
-      method="POST"
+      method="POST" enctype="multipart/form-data"
       class="space-y-6 bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
     @csrf
     @if(isset($question))
@@ -29,6 +29,24 @@
             class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500"
             required>{{ old('question_stem', $question->question_stem ?? '') }}</textarea>
     </div>
+
+    <!-- Question Image (Optional) -->
+    <div>
+        <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Upload Image (Optional)
+        </label>
+
+        <input type="file" name="image" id="image"
+            class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500">
+
+        @if(isset($question) && $question->image)
+            <div class="mt-3">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Current Image:</p>
+                <img src="{{ asset('storage/question-images/' . $question->image) }}" class="w-32 h-auto rounded-md border" />
+            </div>
+        @endif
+    </div>
+
 
     <!-- Topic -->
     <div style="display: none;">

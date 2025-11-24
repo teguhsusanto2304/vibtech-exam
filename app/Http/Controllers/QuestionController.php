@@ -17,8 +17,7 @@ class QuestionController extends Controller
         ->whereNot('data_status','inactive')
         ->when($search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
-                $q->where('question_stem', 'like', "%{$search}%")
-                ->orWhere('topic', 'like', "%{$search}%");
+                $q->where('question_stem', 'like', "%{$search}%");
             });
         })
         ->orderBy('created_at', 'desc')
@@ -78,7 +77,14 @@ class QuestionController extends Controller
             'option_d' => 'required|string',
             'correct_option' => 'required|in:A,B,C,D',
             'explanation' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->storeAs('question-images', $filename, 'public');
+            $validated['image'] = $filename;
+        }
 
         Question::create($validated);
 
@@ -98,8 +104,14 @@ class QuestionController extends Controller
             'option_d' => 'required|string',
             'correct_option' => 'required|in:A,B,C,D',
             'explanation' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
+        if ($request->hasFile('image')) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->storeAs('question-images', $filename, 'public');
+            $validated['image'] = $filename;
+        }
         $question->update($validated);
 
         return redirect()->route('admin.question-banks')->with('success', 'Question updated successfully.');

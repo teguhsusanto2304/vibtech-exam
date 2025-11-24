@@ -26,10 +26,18 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if(Auth::user()->data_status==='inactive')
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'The user account has been inactivated.',
+            ], 401);
+        }
+
         //$exams  = UserExam::with('exam')->where('user_id', auth()->id())->first(); 
         $exams = UserExam::with('exam')->where('user_id', Auth::user()->id)
-                    ->whereDate('active_date', '>=', now())
-                    ->whereDate('end_date', '<=', now())
+                    ->whereDate('active_date', '<=', now())
+                    ->whereDate('end_date', '>=', now())
                     ->first();
 
         if (!$exams) {
@@ -38,6 +46,13 @@ class AuthController extends Controller
                 'message' => 'No exam found for this user.',
             ], 404);
         } else {
+            if($exams->exam->data_status!='publish')
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No exam found for this user.',
+                ], 404);
+            }
             if($exams->data_status=='passed' || $exams->data_status=='cancel') 
             {
                 return response()->json([

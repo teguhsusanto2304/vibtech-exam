@@ -74,11 +74,15 @@
                     <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">
                         Exam Description
                     </p>
-                    <textarea 
-                        name="description" 
-                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary min-h-14 h-14 placeholder:text-[#617589] p-[15px] text-base font-normal leading-normal" 
+                    <textarea
+                        id="description"
+                        name="description"
+                        class="form-input flex w-full min-w-0 flex-1 resize-y overflow-y-auto rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary min-h-14 p-[15px] text-base font-normal leading-normal"
                         placeholder="A brief summary of the exam"
                     >{{ $getFieldValue('description') }}</textarea>
+
+                    
+
                 </label>
             </div>
         </div>
@@ -231,6 +235,15 @@
 <script>
     ClassicEditor
         .create( document.querySelector( '#ckeditor' ),{
+            ckfinder: {
+                uploadUrl: '{{ route('ckeditor.upload').'?_token='.csrf_token()}}',
+            }
+        })
+        .catch( error => {
+            console.error(error);
+        } );
+    ClassicEditor
+        .create( document.querySelector( '#description' ),{
             ckfinder: {
                 uploadUrl: '{{ route('ckeditor.upload').'?_token='.csrf_token()}}',
             }

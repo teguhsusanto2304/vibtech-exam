@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Exam;
 use App\Models\ExamQuestion;
 use App\Models\Question;
+use App\Models\User;
+use App\Models\UserExam;
+use App\Notifications\ExamStatusUpdated;
+use Illuminate\Support\Facades\Notification;
 
 class ExamController extends Controller
 {
@@ -178,47 +182,47 @@ class ExamController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $exam = Exam::find($id);
-    // 1. Validation: Re-use the exact same validation rules
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'questions' => 'required|integer|min:0',
-        'duration' => 'required|integer|min:0',
-        // Assuming the hidden input field is named 'data_status'
-        'data_status' => 'nullable|string|max:50', 
-        'randomize_options' => 'nullable',
-        'randomize_questions' => 'nullable',
-        'pass_mark' => 'required|integer|min:30|max:100',
-        'instruction' => 'required|min:10'
-    ]);
+    {
+        $exam = Exam::find($id);
+        // 1. Validation: Re-use the exact same validation rules
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'questions' => 'required|integer|min:0',
+            'duration' => 'required|integer|min:0',
+            // Assuming the hidden input field is named 'data_status'
+            'data_status' => 'nullable|string|max:50', 
+            'randomize_options' => 'nullable',
+            'randomize_questions' => 'nullable',
+            'pass_mark' => 'required|integer|min:30|max:100',
+            'instruction' => 'required|min:10'
+        ]);
 
-    // 2. Prepare data for update
-    $dataToUpdate = [
-        'title' => $validated['title'],
-        'description' => $validated['description'] ?? null,
-        'questions' => $validated['questions'] ?? 0,
-        'duration' => $validated['duration'] ?? 0,
-        'data_status' => $validated['data_status'] ?? 'draft',
-        'last_modified' => now(),
-        'pass_mark' => $validated['pass_mark'],
-        'instruction' => $validated['instruction'],
-        
-        // Checkbox values: We check if the request explicitly has the field, 
-        // otherwise default to 0 (unchecked) due to the hidden input '0' fallback.
-        'randomize_options' => $request->has('randomize_options') ? 1 : 0,
-        'randomize_questions' => $request->has('randomize_questions') ? 1 : 0,
-    ];
+        // 2. Prepare data for update
+        $dataToUpdate = [
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'questions' => $validated['questions'] ?? 0,
+            'duration' => $validated['duration'] ?? 0,
+            'data_status' => $validated['data_status'] ?? 'draft',
+            'last_modified' => now(),
+            'pass_mark' => $validated['pass_mark'],
+            'instruction' => $validated['instruction'],
+            
+            // Checkbox values: We check if the request explicitly has the field, 
+            // otherwise default to 0 (unchecked) due to the hidden input '0' fallback.
+            'randomize_options' => $request->has('randomize_options') ? 1 : 0,
+            'randomize_questions' => $request->has('randomize_questions') ? 1 : 0,
+        ];
 
-    // 3. Update the existing exam model instance
-    $exam->update($dataToUpdate);
+        // 3. Update the existing exam model instance
+        $exam->update($dataToUpdate);
 
-    // 4. Redirect the user back to the exam questions page with a success message
-    return redirect()
-        ->route('admin.exams')
-        ->with('success', 'Exam "' . $exam->title . '" updated successfully!');
-}
+        // 4. Redirect the user back to the exam questions page with a success message
+        return redirect()
+            ->route('admin.exams')
+            ->with('success', 'Exam "' . $exam->title . '" updated successfully!');
+    }
 
     public function questions(Request $request,$id)
     {
@@ -287,15 +291,20 @@ class ExamController extends Controller
         $exam = Exam::findOrFail($id);
         
         // Check if exam has questions before activating
-        if ($request->data_status !== 'pending' && $exam->examQuestions()->count() === 0) {
+        if ($request->data_status === 'publish' && $exam->examQuestions()->count() === 0) {
             return redirect()
                 ->back()
                 ->with('error', 'Cannot change status — this exam has no questions assigned.');
         }
         $exam->data_status = $request->data_status;
         $exam->save();
-        $status = $exam->data_status.''.($exam->data_status=='pending'?'':'ed');
-        return redirect()->route('admin.exams.questions',['id'=>$id])->with('success', 'Exam '.$status.' successfully.');
+        $status = $exam->data_status.''.($exam->data_status=='archived'?'':'ed');
+        if($exam->data_status==='draft')
+        {
+            return redirect()->route('admin.exams.questions',['id'=>$id])->with('success', 'Exam '.$status.' successfully.');
+        } else {
+            return redirect()->route('admin.exams')->with('success', 'Exam '.$status.' successfully.');
+        }
     }
 
     public function show($id)
@@ -318,9 +327,38 @@ class ExamController extends Controller
     public function destroy($id)
     {
         $exam = Exam::find($id);
-        $exam->data_status='inactive';
+        $exam->data_status='archived';
         $exam->save();
         return redirect()->back()->with('success', "Exam '{$exam->title}' deleted sucessfully! ");
+    }
+
+    public function examResult(Request $request)
+    {
+        $userExamId = $request->query('id');
+        $result = UserExam::with(['exam', 'answers.examQuestion'])
+            ->where('id', $userExamId)
+            ->first();
+
+        $correctCount = $result->answers->filter(function ($answer) {
+            return $answer->is_correct==true;
+        })->count();
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Result not found'
+            ], 404);
+        }
+
+        $status = $result->scores >= $result->exam->pass_mark ? 'passed' : 'cancel';
+        $student = User::find($result->user_id);
+
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
+        return response()->json([            
+            "exam"=>["pass_mark"=>$result->exam->pass_mark,"scores"=> $result->scores,
+            "total_questions"=> $result->exam->questions,"attempts_used"=>$result->attempts_used],
+            "correctCount"=>$correctCount,
+            "status"=>$status]);
     }
 
 }

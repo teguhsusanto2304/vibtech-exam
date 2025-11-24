@@ -7,6 +7,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\CKEditorController;
+use App\Http\Controllers\NotificationController;
+
+Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+    ->middleware('auth')
+    ->name('notifications.read');
+
 
 Route::post('/ckeditor/upload', [CKEditorController::class, 'upload'])->name('ckeditor.upload');
 
@@ -33,6 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
     Route::get('/admin/dashboard', [AdminController::class,'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/profile', [UserController::class,'profile'])->name('admin.profile');
+    Route::get('/admin/change-password', [UserController::class,'password'])->name('admin.change-password');
+    Route::post('/admin/update-password', [UserController::class,'updatePassword'])->name('admin.update-password');
     Route::get('/admin/users', [UserController::class,'index'])->name('admin.users');
     Route::get('/admin/users/create', [UserController::class,'create'])->name('admin.users.create');
     Route::post('/admin/users/store', [UserController::class,'store'])->name('admin.users.store');
@@ -41,7 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/users/{id}/assign-exam', [UserController::class,'assignExam'])->name('admin.users.assign-exam');
     Route::post('/admin/users/{userId}/save-assign-exam',[UserController::class,'saveAssignExam'])->name('admin.users.save-assign-exam');
     Route::get('/admin/users/{id}/edit', [UserController::class,'edit'])->name('admin.users.edit');
-    Route::delete('/admin/users/{id}/destroy', [UserController::class,'destroy'])->name('admin.users.destroy');
+    Route::put('/admin/users/{id}/destroy', [UserController::class,'destroy'])->name('admin.users.destroy');
     Route::get('/admin/users/{id}/status', [UserController::class, 'toggleStatus'])->name('admin.users.status');
     Route::put('/admin/users/exam/{id}/update-exam', [UserController::class, 'updateExam'])
     ->name('admin.users.update-exam');
@@ -63,6 +72,7 @@ Route::middleware('auth')->group(function () {
         ->name('admin.exams.clear-questions');
     Route::delete('/admin/exams/{examId}/{questionId}/remove-question', [ExamController::class, 'removeQuestion'])
         ->name('admin.exams.remove-question');
+    Route::get('admin/exams/check/{id}',[AdminController::class,'getQuizQuestion']);
 
     Route::get('/admin/question-banks', [QuestionController::class,'index'])->name('admin.question-banks');
     Route::get('/admin/question-banks/{id}/show', [QuestionController::class,'show'])->name('admin.question-banks.show');

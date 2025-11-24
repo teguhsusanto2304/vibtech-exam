@@ -69,6 +69,7 @@
             <div>
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select id="role" name="role"
+                @if(!empty($user)) disabled @endif
                         class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2">
                     <option value="">Choose Role</option>
                     @if(!empty($user))
@@ -89,7 +90,7 @@
                 </label>
                 <div class="flex">
                     <input 
-                        type="text" 
+                        type="password" 
                         id="password" 
                         name="password"
                         class="flex-1 border border-gray-300 rounded-l-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"

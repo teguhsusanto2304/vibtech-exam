@@ -80,7 +80,7 @@
                   data-action="set the exam status to PENDING">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="data_status" value="pending">
+                <input type="hidden" name="data_status" value="archived">
                 
                 <button type="submit" 
                         class="flex items-center justify-center h-10 px-4 

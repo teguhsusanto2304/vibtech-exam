@@ -196,7 +196,7 @@
                                                             {{ optional($attempt->finished_at)->format('d M Y') ?? '—' }}
                                                         </td>
                                                         <td class="px-6 py-4 text-right" x-data="{ openEdit: false, openDelete: false }">
-                                                            @if($attempt->data_status==='pending')
+                                                            @if($attempt->data_status==='pending' && $attempt->attempts_used ===0)
                                                             <!-- Edit Button -->
                                                             <button 
                                                                 @click="openEdit = true"

@@ -80,7 +80,7 @@ class AdminController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
+        return redirect()->route('login')->with('success', 'You have been logged out.');
     }
 
     public function generalLogin(Request $request)
@@ -212,5 +212,65 @@ class AdminController extends Controller
     public function questionBanks()
     {
         return view('admin.question_banks');
+    }
+
+    public function getQuizQuestion(Request $request,$id)
+    {
+        $userId = $request->query('userId');
+        $user_exam_id = $id;
+
+        // Get the exam only if it belongs to logged user
+        $userExam = UserExam::with('exam.masterExamQuestions','answers')
+            ->where('id', $user_exam_id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$userExam) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Exam not found or not assigned to this user.',
+            ], 404);
+        }
+
+        // If no start time = new attempt
+        if ((int) $userExam->attempts_used < 3 && $userExam->data_status!='passed') {
+            \App\Models\UserAnswer::where('user_exam_id', $user_exam_id)->delete();
+            if($userExam->exam->questions === $userExam->answers->count() )
+                {
+                    //$userExam->attempts_used += 1;
+                    //$userExam->save();
+                } else if($userExam->answers->count() === 0) {
+                    $userExam->started_at = now();
+                    $userExam->attempts_used += 1;
+                    $userExam->save();
+                }
+            $userAnswers = \App\Models\UserAnswer::where(['user_exam_id'=>$user_exam_id,'attempts_used'=>$userExam->attempts_used])->get();
+            foreach($userAnswers as $answer){
+                    \DB::table('user_answers_history')->insert([
+                        'id' => $answer->id,
+                        'user_exam_id' => $answer->user_exam_id,
+                        'exam_question_id' => $answer->exam_question_id,
+                        'user_option' => $answer->user_option,
+                        'is_correct' => $answer->is_correct,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'attempts_used' => $userExam->attempts_used,
+                    ]);
+            }
+
+             return response()->json([
+                'success' => true,
+                'questions' => $userExam->exam->questions,
+                'count_of_answer'=>$userExam->answers->count()
+            ], 404);
+            //UserAnswer::where('user_exam_id', $user_exam_id)->delete();
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'questions' => $userExam->exam->questions,
+                'count_of_answer'=>$userExam->answers->count()
+            ], 404);
+        }
     }
 }

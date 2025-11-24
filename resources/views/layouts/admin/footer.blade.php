@@ -40,6 +40,7 @@
         
         // Select all forms that require confirmation
         const formsNeedingConfirmation = document.querySelectorAll('.needs-confirmation');
+        const formsNeedingConfirmationSecond = document.querySelectorAll('.needs-confirmation-second');
         
         let formToSubmit = null; // Variable to hold the form element that was clicked
 
@@ -69,6 +70,21 @@
                 formToSubmit = null; // Clear the form reference
             }, 200);
         };
+
+        formsNeedingConfirmationSecond.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+                
+                // 1. Store the reference to the currently submitting form
+                formToSubmit = this;
+                
+                // 2. Get the confirmation message from the form's data attribute
+                const actionMessage = this.getAttribute('data-action') || 'perform this action';
+                
+                // 3. Show the modal with the custom message
+                showModal(actionMessage);
+            });
+        });
 
         // --- Attach Listeners to ALL Forms ---
         formsNeedingConfirmation.forEach(form => {
@@ -103,4 +119,86 @@
         cancelButton.addEventListener('click', hideModal);
         document.getElementById('modal-backdrop').addEventListener('click', hideModal);
     });
+</script>
+
+<div id="confirmation-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    
+    <div style="background: white; padding: 25px; border-radius: 8px; max-width: 400px; text-align: center;">
+        <div class="text-center mb-4">
+            <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white" id="modal-title">Confirm Action</h3>
+            <div class="mt-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    You are about to <strong id="modal-message">perform an irreversible action</strong>. 
+                    Please confirm to proceed.
+                </p>
+            </div>
+        </div>
+        <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+            <button type="button" id="modal-confirm-btn" 
+                    class="inline-flex w-full justify-center rounded-lg border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm">
+                Confirm
+            </button>
+            <button type="button" id="modal-cancel-btn"
+                    class="mt-3 inline-flex w-full justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm">
+                Cancel
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    // Global variable to store the form element that needs to be submitted
+    let formToSubmit = null;
+
+    // Get the DOM elements for the modal and buttons
+    const modal = document.getElementById('confirmation-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+
+    /**
+     * Shows the confirmation modal customized for the given form.
+     * @param {string} formId - The ID of the form element to be confirmed.
+     */
+    function triggerConfirmModal(formId) {
+        // 1. Get the form element
+        const form = document.getElementById(formId);
+        
+        if (!form) {
+            console.error(`Form with ID ${formId} not found.`);
+            return;
+        }
+
+        // 2. Extract the action text from the data-action attribute
+        const actionText = form.getAttribute('data-action') || 'perform this action';
+
+        // 3. Store the form globally and update the modal content
+        formToSubmit = form; 
+        modalMessage.textContent = `${actionText}`;
+        
+        // 4. Show the modal
+        modal.style.display = 'flex'; 
+    }
+
+    // --- Modal Button Event Handlers ---
+
+    // Handle the CONFIRM button click
+    confirmBtn.onclick = function() {
+        modal.style.display = 'none'; // Hide the modal
+        
+        if (formToSubmit) {
+            // Submit the stored form
+            formToSubmit.submit(); 
+            // Clear the reference
+            formToSubmit = null; 
+        }
+    };
+
+    // Handle the CANCEL button click
+    cancelBtn.onclick = function() {
+        modal.style.display = 'none'; // Hide the modal
+        formToSubmit = null; // Clear the reference
+    };
+
 </script>
