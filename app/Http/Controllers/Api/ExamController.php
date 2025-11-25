@@ -35,7 +35,11 @@ class ExamController extends Controller
 
     public function detail(Request $request)
     {
-        $exams  = UserExam::with('exam')->where('user_id', auth()->id())->get(); 
+        $exams  = UserExam::with('exam')
+        ->where('user_id', auth()->id())
+        ->where('data_status','pending')
+        ->latest()
+        ->get(); 
 
         if ($exams->isEmpty()) {
             return response()->json([
