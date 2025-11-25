@@ -186,8 +186,10 @@ class UserController extends Controller
         // Check for date overlap with other schedules
         $conflict = UserExam::where(['user_id' => $userId])
             ->where(function ($query) use ($validated) {
-                $query->where('active_date', '<=', $validated['end_date'])
-                    ->where('end_date', '>=', $validated['active_date']);
+                //$query->where('active_date', '<=', $validated['end_date'])
+                //    ->where('end_date', '>=', $validated['active_date'])
+                //    ->where('data_status','pending');
+                $query->where('data_status','pending');
             })
             ->exists();
 

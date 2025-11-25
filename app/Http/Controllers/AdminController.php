@@ -161,7 +161,16 @@ class AdminController extends Controller
             }
             if(Auth::user()->role=='admin')
             {
-                return redirect()->intended('admin/users')->with('success', 'Welcome back!');
+                if(Auth::user()->data_status=='active')
+                {
+                    return redirect()->intended('admin/users')->with('success', 'Welcome back!');
+                } else {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'email' => 'You are not authorized to log in because you have no active on your account.',
+                    ])->onlyInput('email');
+                }
+                
             } else if(Auth::user()->role=='userx') {
                 $hasExam = UserExam::with('exam')->where('user_id', Auth::user()->id)
                     ->whereDate('active_date', '<=', now())
