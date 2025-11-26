@@ -55,7 +55,7 @@ class AuthController extends Controller
                     'message' => 'No exam found for this user.',
                 ], 404);
             }
-            if($exams->data_status=='passed' || $exams->data_status=='cancel') 
+            if($exams->data_status=='passed' || $exams->data_status=='cancel' || $exams->attempts_used ==3) 
             {
                 return response()->json([
                     'success' => false,
@@ -68,9 +68,14 @@ class AuthController extends Controller
         // User() adalah metode di Auth, BUKAN di Query Builder.
         // Anda tidak dapat menggunakan select() di sini.
         $user = Auth::user(); 
+        $userEdit = auth()->user();
+        $userEdit->attempts_used=$exams->attempts_used;
+        $userEdit->save();
         
         // 3. Buat Token
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        //add $exams->attempts_used set on session
 
         // 4. Kirim respons dengan data user yang difilter
         return response()->json([
@@ -94,6 +99,7 @@ class AuthController extends Controller
 
         if ($request->user()) {
         // Hapus token jika user ditemukan
+            session()->flush();
             $request->user()->currentAccessToken()->delete();
         
         return response()->json(['message' => 'Logged out']);

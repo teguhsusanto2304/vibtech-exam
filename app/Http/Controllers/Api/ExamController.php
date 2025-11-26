@@ -11,6 +11,7 @@ use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\ExamStatusUpdated;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Notification;
 
 class ExamController extends Controller
@@ -74,6 +75,7 @@ class ExamController extends Controller
 
     public function getQuizQuestion($id)
     {
+
         $userId = auth()->id();
         $user_exam_id = $id;
 
@@ -93,15 +95,19 @@ class ExamController extends Controller
         // If no start time = new attempt
         if ((int) $userExam->attempts_used < 3 && $userExam->data_status!='passed') {
             UserAnswer::where('user_exam_id', $user_exam_id)->delete();
-            if($userExam->exam->questions === $userExam->answers->count() )
+            if($userExam->exam->questions > 0 )
                 {
-                    //$userExam->attempts_used += 1;
+                    //$userExam->attempts_used = session('attempts_used')+3;
                     //$userExam->save();
                 } else if($userExam->answers->count() === 0) {
                     $userExam->started_at = now();
-                    $userExam->attempts_used += 1;
-                    $userExam->save();
+                    //$userExam->attempts_used += 1;
+                    //$userExam->durations = 0;
+                    //$userExam->save();
                 }
+            //$userExam->attempts_used = session('attempts_used')+2;
+            //$userExam->save();
+            
             $userAnswers = UserAnswer::where(['user_exam_id'=>$user_exam_id,'attempts_used'=>$userExam->attempts_used])->get();
             foreach($userAnswers as $answer){
                     DB::table('user_answers_history')->insert([
@@ -218,6 +224,25 @@ class ExamController extends Controller
         $result = UserExam::with(['exam', 'answers.examQuestion'])
             ->where('id', $userExamId)
             ->first();
+        $user = auth()->user();
+        $new_attempts_used = $user->attempts_used+1; 
+        $status = $result->scores >= $result->exam->pass_mark ? 'passed' : 'cancel';
+        if((int) $new_attempts_used > (int) $result->attempts_used)
+        {
+            $result->attempts_used = $new_attempts_used;
+            if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+                $result->data_status=$status;
+            }
+            $result->save();
+
+            
+            if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+                $user->attempts_used = 0;
+            } else {
+                $user->attempts_used = $new_attempts_used;
+            }
+            $user->save();
+        }
 
         $correctCount = $result->answers->filter(function ($answer) {
             return $answer->is_correct==true;
@@ -228,12 +253,13 @@ class ExamController extends Controller
                 'message' => 'Result not found'
             ], 404);
         }
-
-        $status = $result->scores >= $result->exam->pass_mark ? 'passed' : 'cancel';
         $student = User::find($result->user_id);
 
         $admins = User::where('role', 'admin')->get();
-        Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
+        if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+            Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
+        }
+        
         return response()->json([            
             "exam"=>["pass_mark"=>$result->exam->pass_mark,"scores"=> $result->scores,
             "total_questions"=> $result->exam->questions,"attempts_used"=>$result->attempts_used],

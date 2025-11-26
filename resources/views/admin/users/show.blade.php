@@ -155,17 +155,22 @@
                                                             // Tentukan kelas warna berdasarkan status
                                                             $colorClasses = match ($attempt->data_status) {
                                                                 'passed' => 'bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100',
-                                                                'failed' => 'bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100',
+                                                                'cancel' => 'bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100',
                                                                 'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100',
                                                                 default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100', // Default atau status tidak dikenal
                                                             };
                                                             
                                                             // Gabungkan semua kelas
                                                             $badgeClasses = $baseClasses . ' ' . $colorClasses;
+                                                            if($attempt->data_status==='pending' && ($attempt->attempts_used >= 1 && $attempt->attempts_used <= 3)){
+                                                                $status_user_exam ='failed';
+                                                            } else {
+                                                                $status_user_exam = $attempt->data_status;
+                                                            }
                                                         @endphp
 
                                                         <p class="{{ $badgeClasses }}">
-                                                            {{ $attempt->data_status }}
+                                                            {{ $status_user_exam =='cancel'?'Failed':$status_user_exam }}
                                                         </p>
                                                         </td>
                                                         <td class="px-6 py-4">

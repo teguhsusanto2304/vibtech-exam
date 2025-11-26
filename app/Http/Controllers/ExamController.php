@@ -296,6 +296,13 @@ class ExamController extends Controller
                 ->back()
                 ->with('error', 'Cannot change status — this exam has no questions assigned.');
         }
+        $userExamCount = UserExam::where(['exam_id'=>$exam->id,'data_status'=>'pending'])->count();
+        if ($exam->data_status === 'publish' && $request->data_status==='draft' && $userExamCount > 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot change status. This exam is currently active (being taken by users).');
+        }
+
         $exam->data_status = $request->data_status;
         $exam->save();
         $status = $exam->data_status.''.($exam->data_status=='archived'?'':'ed');

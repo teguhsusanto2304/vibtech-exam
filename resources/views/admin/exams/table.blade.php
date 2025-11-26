@@ -32,7 +32,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <h3 class="font-medium">{{ $exam->title }}</h3>
-                        <p class="text-sm">{{ $exam->description }}</p>
+                        <p class="text-sm">{!! $exam->description !!}</p>
                     </td>
                     
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
