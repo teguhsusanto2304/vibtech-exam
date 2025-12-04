@@ -100,6 +100,7 @@
                                 </form>
                                 @endif
                                 @if($exam->data_status==='draft')
+                                @if($exam->data_status==='draft11')
                                 <form 
                                     id="exam-status-form-{{ $exam->id }}" 
                                     action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
@@ -117,6 +118,7 @@
                                         <x-heroicon-o-lock-closed class="w-4 h-4" />
                                     </button>
                                 </form>
+                                @endif
 
                                 <a href="{{ route('admin.exams.edit',['id'=>$exam->id]) }}"
                                    class="inline-flex items-center justify-center w-8 h-8 text-green-600 hover:bg-green-100 rounded-full"
