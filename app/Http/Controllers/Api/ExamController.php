@@ -227,7 +227,15 @@ class ExamController extends Controller
             ->first();
         $user = auth()->user();
         $new_attempts_used = $user->attempts_used+1; 
-        $status = $result->scores >= $result->exam->pass_mark ? 'passed' : 'cancel';
+        
+        // Determine status based on score and attempts
+        if ($result->scores >= $result->exam->pass_mark) {
+            $status = 'passed';
+        } elseif ($new_attempts_used < 3) {
+            $status = 'pending';
+        } else {
+            $status = 'cancel';
+        }
         if((int) $new_attempts_used > (int) $result->attempts_used)
         {
             $result->attempts_used = $new_attempts_used;
