@@ -60,7 +60,7 @@
 @endif
 </div>
 <div class="flex flex-col gap-3 p-4 text-center">
-<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">{{ $appName }} Examination Portal</p>
+<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">{{ $appName }}</p>
 <p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Welcome back. Please log in to continue.</p>
 </div>
     @if ($errors->any())
