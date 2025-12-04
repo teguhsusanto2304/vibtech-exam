@@ -260,7 +260,7 @@ class ExamController extends Controller
         if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
             Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
             //Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
-            Mail::to('teguh.susanto@hotmail.com')->send(new ExamResultMail($student, $result, $status));
+            Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
         }
         
         return response()->json([            
