@@ -11,8 +11,9 @@ use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\ExamStatusUpdated;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Notification;
+use App\Mail\ExamResultMail;
+use Illuminate\Support\Facades\Mail;
 
 class ExamController extends Controller
 {
@@ -258,6 +259,8 @@ class ExamController extends Controller
         $admins = User::where('role', 'admin')->get();
         if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
             Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
+            //Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
+            Mail::to('teguh.susanto@hotmail.com')->send(new ExamResultMail($student, $result, $status));
         }
         
         return response()->json([            

@@ -8,6 +8,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\CKEditorController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SettingsController;
 
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
     ->middleware('auth')
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/profile', [UserController::class,'profile'])->name('admin.profile');
     Route::get('/admin/change-password', [UserController::class,'password'])->name('admin.change-password');
     Route::post('/admin/update-password', [UserController::class,'updatePassword'])->name('admin.update-password');
+    
+    Route::get('/admin/settings', [SettingsController::class,'index'])->name('admin.settings');
+    Route::put('/admin/settings/update', [SettingsController::class,'update'])->name('admin.settings.update');
+    
     Route::get('/admin/users', [UserController::class,'index'])->name('admin.users');
     Route::get('/admin/users/create', [UserController::class,'create'])->name('admin.users.create');
     Route::post('/admin/users/store', [UserController::class,'store'])->name('admin.users.store');

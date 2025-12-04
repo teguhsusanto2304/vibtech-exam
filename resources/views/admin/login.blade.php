@@ -3,7 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title', 'Vibtech Genesis')</title>
+    @php
+        $appName = getSetting('app_name', 'Vibtech Genesis');
+    @endphp
+    <title>@yield('title', $appName . ' - Login')</title>
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -43,10 +46,21 @@
 <div class="px-4 flex flex-1 justify-center py-5">
 <div class="layout-content-container flex flex-col w-full max-w-md">
 <div class="flex flex-col items-center mb-8">
-<img class="h-12 w-auto mb-4" data-alt="Vibtech Genesis Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCziq1bTMarfttnlutU9XXECXYIcm-eA4VthAvzXlEwJTXyPMyOvam9Q1_ycZF4Q1o9Z8IUM6Kh9ChJrgZQgGvZxfLJsYdgW5xiA9CFCLL7VNt6sflvg6KlzkA2n06ZTthfdtA1O30TYxP0t8ufTfxjP1Pig0tigvKt_LZ5_GV3VVGzh8RNu7X2BJKoHADG_MrDCVKp5-P2LB8tIJtRUJk9RJ6YGRec4lwyPiSYC9_Jn9B8ZYaxitmIHLkuKHPy8_jmsZhpstqYRhVR"/>
+@php
+    $appLogo = getSetting('app_logo', '/images/logo.png');
+@endphp
+@if ($appLogo && $appLogo !== '/images/logo.png')
+<img class="h-12 w-auto mb-4 object-contain" data-alt="{{ $appName }} Logo" src="{{ $appLogo }}">
+@else
+<div class="h-12 w-12 mb-4 text-primary">
+<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+@endif
 </div>
 <div class="flex flex-col gap-3 p-4 text-center">
-<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">Vibtech Genesis Examination Portal</p>
+<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">{{ $appName }} Examination Portal</p>
 <p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Welcome back. Please log in to continue.</p>
 </div>
     @if ($errors->any())
@@ -105,7 +119,10 @@
 <!-- END: Added Form Tag -->
 </div>
 <div class="mt-8 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
-<a class="hover:underline" href="#">Support</a>
+@php
+    $supportEmail = getSetting('support_email', '#');
+@endphp
+<a class="hover:underline" href="mailto:{{ $supportEmail }}">Support</a>
 <span class="mx-2">·</span>
 <a class="hover:underline" href="#">Privacy Policy</a>
 </div>

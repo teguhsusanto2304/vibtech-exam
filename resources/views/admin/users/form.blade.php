@@ -84,7 +84,7 @@
 
             
             <!-- Password (full width) -->
-             @if(!empty($user) && $user->role==='user')
+             @if((!empty($user) && $user->role==='user') || empty($user) )
             <div class="md:col-span-1">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
                     Password

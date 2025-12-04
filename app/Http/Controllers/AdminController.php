@@ -211,9 +211,81 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $users = User::where(['role'=>'user','data_status'=>'active'])->count();
-        $inactive_users = User::where(['role'=>'user','data_status'=>'inactive'])->count();
-        return view('admin.dashboard',compact('users','inactive_users'));
+        // Get current month and year
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+        
+        // Dashboard statistics - Total (All time)
+        $totalUsers = User::where(['role'=>'user','data_status'=>'active'])->count();
+        $inactiveUsers = User::where(['role'=>'user','data_status'=>'inactive'])->count();
+        
+        // Get active exams count
+        $activeExams = \App\Models\Exam::where('data_status', 'publish')->count();
+        
+        // Get total questions count
+        $totalQuestions = \App\Models\Question::where('data_status', 'active')->count();
+        
+        // Statistics for current month
+        $thisMonthUsers = User::where(['role'=>'user','data_status'=>'active'])
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->count();
+        
+        $thisMonthCompletedExams = UserExam::whereIn('data_status', ['passed','cancel'])
+            ->whereMonth('finished_at', $currentMonth)
+            ->whereYear('finished_at', $currentYear)
+            ->count();
+        
+        $thisMonthOngoingExams = UserExam::where('data_status', 'pending')
+            ->where('attempts_used', '>', 0)
+            ->whereMonth('started_at', $currentMonth)
+            ->whereYear('started_at', $currentYear)
+            ->count();
+        
+        // Get on-going exams with user details (filtered by current month)
+        $ongoingExams = UserExam::with(['user', 'exam'])
+            ->where('data_status', 'pending')
+            ->where('attempts_used', '>', 0)
+            ->whereBetween('started_at', [$monthStart, $monthEnd])
+            ->latest('started_at')
+            ->limit(10)
+            ->get();
+        
+        // Get completed exams with user details (filtered by current month)
+        $completedExams = UserExam::with(['user', 'exam'])
+            ->whereIn('data_status', ['passed','cancel'])
+            ->whereBetween('finished_at', [$monthStart, $monthEnd])
+            ->latest('finished_at')
+            ->limit(10)
+            ->get();
+        
+        // Get not yet started exams with user details (filtered by current month)
+        $notStartedExams = UserExam::with(['user', 'exam'])
+            ->where('data_status', 'pending')
+            ->where('attempts_used', 0)
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->latest('created_at')
+            ->limit(10)
+            ->get();
+        
+        // Format current month and year for display
+        $currentMonthYear = now()->format('F Y');
+        
+        return view('admin.dashboard', compact(
+            'totalUsers',
+            'inactiveUsers',
+            'activeExams',
+            'totalQuestions',
+            'thisMonthUsers',
+            'thisMonthCompletedExams',
+            'thisMonthOngoingExams',
+            'ongoingExams',
+            'completedExams',
+            'notStartedExams',
+            'currentMonthYear'
+        ));
     }
 
     
