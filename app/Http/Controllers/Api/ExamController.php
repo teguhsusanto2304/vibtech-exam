@@ -37,7 +37,7 @@ class ExamController extends Controller
 
     public function detail(Request $request)
     {
-        $exams  = UserExam::with('exam')
+        $exams  = UserExam::with(['exam', 'user'])
         ->where('user_id', auth()->id())
         ->where('data_status','pending')
         ->latest()
@@ -54,6 +54,8 @@ class ExamController extends Controller
 
         foreach ($exams as $row) {
             $arrExam[] = [
+                'user_name'     => $row->user->name,
+                'user_company'  => $row->user->company,
                 'exam_title'    => $row->exam->title,
                 'questions'     => $row->exam->questions,
                 'description'   => $row->exam->description,
@@ -267,13 +269,86 @@ class ExamController extends Controller
         $admins = User::where('role', 'admin')->get();
         if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
             Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
-            //Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
+            //Mail::to('teguh.susanto@hotmail.com')->send(new ExamResultMail($student, $result, $status));
             Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
         }
         
         return response()->json([            
-            "exam"=>["pass_mark"=>$result->exam->pass_mark,"scores"=> $result->scores,
+            "exam"=>["title"=>$result->exam->title,"pass_mark"=>$result->exam->pass_mark,"scores"=> $result->scores,
             "total_questions"=> $result->exam->questions,"attempts_used"=>$result->attempts_used],
+             "user"=>[
+                "name"=>$student->name,
+                "email"=>$student->email,
+                "company"=>$student->company
+            ],
+            "correctCount"=>$correctCount,
+            "status"=>$status]);
+    }
+
+    public function examResultOld($userExamId)
+    {
+        $result = UserExam::with(['exam', 'answers.examQuestion'])
+            ->where('id', $userExamId)
+            ->first();
+        $user = auth()->user();
+        $new_attempts_used = $user->attempts_used+1; 
+        
+        // Determine status based on score and attempts
+        if ($result->scores >= $result->exam->pass_mark) {
+            $status = 'passed';
+        } elseif ($new_attempts_used < 3) {
+            $status = 'pending';
+        } else {
+            $status = 'cancel';
+        }
+        if((int) $new_attempts_used > (int) $result->attempts_used)
+        {
+            $result->attempts_used = $new_attempts_used;
+            if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+                $result->data_status=$status;
+            }
+            $result->save();
+
+            
+            if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+                $user->attempts_used = 0;
+            } else {
+                $user->attempts_used = $new_attempts_used;
+            }
+            $user->save();
+        }
+
+        $correctCount = $result->answers->filter(function ($answer) {
+            return $answer->is_correct==true;
+        })->count();
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Result not found'
+            ], 404);
+        }
+        $student = User::find($result->user_id);
+
+        $admins = User::where('role', 'admin')->get();
+        if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
+            Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
+            Mail::to('teguh.susanto@hotmail.com')->send(new ExamResultMail($student, $result, $status));
+            //Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
+        }
+        
+        return response()->json([            
+            "exam"=>[
+                "title"=>$result->exam->title,
+                "pass_mark"=>$result->exam->pass_mark,
+                "scores"=> $result->scores,
+                "total_questions"=> $result->exam->questions,
+                "attempts_used"=>$result->attempts_used
+            ],
+            "user"=>[
+                "name"=>$student->name,
+                "email"=>$student->email,
+                "company"=>$student->company
+            ],
             "correctCount"=>$correctCount,
             "status"=>$status]);
     }

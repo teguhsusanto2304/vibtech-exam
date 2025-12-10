@@ -1,17 +1,25 @@
 <x-mail::message>
 # Hello {{ $student->name }},
 
-Your exam results are ready.
+Please view your examination result below.
 
-- **Exam:** {{ $result->exam->title }}
-- **Score:** {{ $result->scores }}
-- **Passing Mark:** {{ $result->exam->pass_mark }}
-- **Status:** **{{ strtoupper($status) }}**
+- **Candidate Name:** {{ $student->name }}
+- **Candidate Company:** {{ $student->company }}
+- **Examination Name:** {{ $result->exam->title }}
+- **Examination Date Completion:** {{ $result->finished_at->format("d M Y h:i:s") }}
+- **Examination Attempts:** {{ $result->attempts_used }}
+- **Your Grade:** {{ $result->scores }} %
+- **Passing Grade:** {{ $result->exam->pass_mark }}%
+@if($status === 'cancel')
+- **Result:** **FAILED**
+@else
+- **Result:** **PASSED**
+@endif
 
 @if($status === 'passed')
-🎉 Congratulations! You passed the exam.
+- **Remarks:** 🎉 You passed the examination. 
 @else
-❌ Unfortunately, you did not meet the passing score. Please try again.
+- **Remarks:** ❌ You failed the examination.
 @endif
 
 Thanks,<br>

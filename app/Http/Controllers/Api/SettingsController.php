@@ -111,11 +111,12 @@ class SettingsController extends Controller
     {
         try {
             $logo = getSetting('app_logo', '/images/logo.png');
-
+            $appName = getSetting('app_name', config('app.name'));
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'logo' => $logo
+                    'logo' => $logo,
+                    'appName'=> $appName
                 ]
             ]);
         } catch (\Exception $e) {

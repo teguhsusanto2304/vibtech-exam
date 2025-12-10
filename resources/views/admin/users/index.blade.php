@@ -132,14 +132,43 @@
         });
     });
 
-    // 📄 Handle pagination dynamically
+    // 📄 Handle pagination dynamically with query params preserved
     document.addEventListener('click', function(e) {
-        if (e.target.matches('#userTable .pagination a')) {
+        if (e.target.matches('#userTable .pagination-link')) {
             e.preventDefault();
-            fetch(e.target.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            
+            // Get current search params
+            const search = searchInput.value;
+            const filterBy = filterByInput.value;
+            const url = new URL(e.target.href);
+            
+            // Preserve search params
+            if (search) url.searchParams.set('search', search);
+            if (filterBy) url.searchParams.set('filterBy', filterBy);
+            url.searchParams.set('role', activeRole);
+            url.searchParams.set('status', activeStatus);
+            
+            // Add loading indicator
+            const userTable = document.getElementById('userTable');
+            userTable.style.opacity = '0.6';
+            userTable.style.pointerEvents = 'none';
+            
+            // Fetch with preserved params
+            fetch(url.toString(), { 
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+            })
             .then(response => response.text())
             .then(html => {
                 document.getElementById('userTable').innerHTML = html;
+                userTable.style.opacity = '1';
+                userTable.style.pointerEvents = 'auto';
+                // Scroll to table
+                document.getElementById('userTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            })
+            .catch(err => {
+                console.error('Pagination error:', err);
+                userTable.style.opacity = '1';
+                userTable.style.pointerEvents = 'auto';
             });
         }
     });

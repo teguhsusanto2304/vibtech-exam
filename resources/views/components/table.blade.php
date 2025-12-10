@@ -3,6 +3,7 @@
     'items' => [],
     'actions' => [],
     'badgeFields' => [], // fields that should show as badges, e.g. ['status']
+    'searchParams' => [], // Query parameters to preserve in pagination
 ])
 
 <div class="overflow-x-auto bg-white rounded-lg shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
@@ -133,6 +134,56 @@
     </table>
 </div>
 
-<div class="flex items-center justify-end mt-4 mb-4 mr-4 px-4">
-    {{ $items->onEachSide(1)->links('vendor.pagination.tailwind') }}
+<!-- Improved Pagination -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-4 py-4 bg-gray-50 rounded-lg">
+    <!-- Pagination Info -->
+    <div class="text-sm text-gray-600">
+        @if($items->total() > 0)
+            Showing <span class="font-medium">{{ $items->firstItem() }}</span> to 
+            <span class="font-medium">{{ $items->lastItem() }}</span> of 
+            <span class="font-medium">{{ $items->total() }}</span> results
+        @else
+            <span class="text-gray-500">No results found</span>
+        @endif
+    </div>
+
+    <!-- Pagination Links -->
+    @if($items->hasPages())
+        <div class="flex items-center gap-1">
+            {{-- Previous Page Link --}}
+            @if ($items->onFirstPage())
+                <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                    ← Previous
+                </span>
+            @else
+                <a href="{{ $items->previousPageUrl() }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    ← Previous
+                </a>
+            @endif
+
+            {{-- Pagination Elements --}}
+            @foreach ($items->getUrlRange(1, $items->lastPage()) as $page => $url)
+                @if ($page == $items->currentPage())
+                    <span class="pagination-link px-3 py-2 text-sm text-white bg-primary rounded-lg font-medium">
+                        {{ $page }}
+                    </span>
+                @else
+                    <a href="{{ $url }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                        {{ $page }}
+                    </a>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($items->hasMorePages())
+                <a href="{{ $items->nextPageUrl() }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    Next →
+                </a>
+            @else
+                <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                    Next →
+                </span>
+            @endif
+        </div>
+    @endif
 </div>
