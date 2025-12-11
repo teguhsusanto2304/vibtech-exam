@@ -177,8 +177,82 @@
         </tbody>
     </table>
 </div>
-<div class="flex items-center justify-end mt-4 mb-4 mr-4 px-4">    
-    <div>
-        {{ $exams->onEachSide(1)->links('vendor.pagination.tailwind') }}
+
+<!-- Improved Pagination -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-4 py-4 bg-gray-50 rounded-lg">
+    <!-- Pagination Info -->
+    <div class="text-sm text-gray-600">
+        @if($exams->total() > 0)
+            Showing <span class="font-medium">{{ $exams->firstItem() }}</span> to 
+            <span class="font-medium">{{ $exams->lastItem() }}</span> of 
+            <span class="font-medium">{{ $exams->total() }}</span> results
+        @else
+            <span class="text-gray-500">No results found</span>
+        @endif
     </div>
+
+    <!-- Pagination Links -->
+    @if($exams->hasPages())
+        <div class="flex items-center gap-1 flex-wrap">
+            {{-- Previous Page Link --}}
+            @if ($exams->onFirstPage())
+                <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                    ← Previous
+                </span>
+            @else
+                <a href="{{ $exams->previousPageUrl() }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    ← Previous
+                </a>
+            @endif
+
+            {{-- First Page Link --}}
+            @if($exams->currentPage() > 3)
+                <a href="{{ $exams->url(1) }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    1
+                </a>
+                @if($exams->currentPage() > 4)
+                    <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                @endif
+            @endif
+
+            {{-- Pagination Elements (Smart Range) --}}
+            @php
+                $start = max(1, $exams->currentPage() - 2);
+                $end = min($exams->lastPage(), $exams->currentPage() + 2);
+            @endphp
+
+            @foreach ($exams->getUrlRange($start, $end) as $page => $url)
+                @if ($page == $exams->currentPage())
+                    <span class="pagination-link px-3 py-2 text-sm text-white bg-primary rounded-lg font-medium">
+                        {{ $page }}
+                    </span>
+                @else
+                    <a href="{{ $url }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                        {{ $page }}
+                    </a>
+                @endif
+            @endforeach
+
+            {{-- Last Page Link --}}
+            @if($exams->currentPage() < $exams->lastPage() - 2)
+                @if($exams->currentPage() < $exams->lastPage() - 3)
+                    <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                @endif
+                <a href="{{ $exams->url($exams->lastPage()) }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    {{ $exams->lastPage() }}
+                </a>
+            @endif
+
+            {{-- Next Page Link --}}
+            @if ($exams->hasMorePages())
+                <a href="{{ $exams->nextPageUrl() }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    Next →
+                </a>
+            @else
+                <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                    Next →
+                </span>
+            @endif
+        </div>
+    @endif
 </div>

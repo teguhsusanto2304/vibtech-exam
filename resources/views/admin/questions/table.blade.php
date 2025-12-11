@@ -7,6 +7,6 @@
     :actions="[
         'show' => 'admin.question-banks.show',
         'edit' => 'admin.question-banks.edit',
-        'delete' => 'admin.question-banks.destroy',
+        'remove' => 'admin.question-banks.destroy',
     ]"
 />

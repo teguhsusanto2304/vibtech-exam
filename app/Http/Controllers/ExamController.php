@@ -56,88 +56,69 @@ class ExamController extends Controller
         $pageTitle ='Exam Management';
         // Search filter
         $search = $request->get('search');
+        $perPage = $request->get('per_page', 50); // Default 50, can be changed via query param
+        $status = $request->get('status', 'published'); // Default tab is published
 
-        $examsQuery1 = Exam::query()
-        ->with('examQuestions')
-        ->whereNot('data_status','inactive')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate(10)
-        ->appends(['search' => $search]);
+        // Validate per_page to prevent abuse
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 50;
+        
+        // Validate status
+        $validStatuses = ['publish', 'draft', 'archived'];
+        $status = in_array($status, $validStatuses) ? $status : 'publish';
 
-        $examsQuery = Exam::query();
-        if ($request->get('status') && in_array($request->status, ['publish','archived', 'draft'])) {
-            $examsQuery->where('data_status', $request->status);
-        } else {
-            $examsQuery->where('data_status', 'publish');
-        }
+        // Build base query for all tabs
+        $buildQuery = function($tabStatus) use ($search) {
+            return Exam::query()
+                ->with('examQuestions')
+                ->where('data_status', $tabStatus)
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                    });
+                })
+                ->orderBy('created_at', 'desc');
+        };
 
-        $exams = $examsQuery->paginate(10);
+        // Get data for current tab
+        $exams = $buildQuery($status)
+            ->paginate($perPage, ['*'], 'page')
+            ->appends(['search' => $search, 'per_page' => $perPage, 'status' => $status]);
 
-        $published = Exam::query()
-        ->with('examQuestions')
-        ->whereNot('data_status','published')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate(10, ['*'], 'published')
-        ->appends(['search' => $search]);
+        // Get paginated data for each tab (for display purposes)
+        $published = $buildQuery('published')
+            ->paginate($perPage, ['*'], 'published')
+            ->appends(['search' => $search, 'per_page' => $perPage, 'status' => 'published']);
 
-        $draft = Exam::query()
-        ->with('examQuestions')
-        ->whereNot('data_status','draft')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate(10, ['*'], 'draft')
-        ->appends(['search' => $search]);
+        $draft = $buildQuery('draft')
+            ->paginate($perPage, ['*'], 'draft')
+            ->appends(['search' => $search, 'per_page' => $perPage, 'status' => 'draft']);
 
-        $archived = Exam::query()
-        ->with('examQuestions')
-        ->whereNot('data_status','archived')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate(10, ['*'], 'archived')
-        ->appends(['search' => $search]);
+        $archived = $buildQuery('archived')
+            ->paginate($perPage, ['*'], 'archived')
+            ->appends(['search' => $search, 'per_page' => $perPage, 'status' => 'archived']);
 
+        // Get total count
         $usersCount = Exam::query()
-    // Apply the search filter if a search term exists
-    ->when($search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-        });
-    })
-    // Execute the query and return only the count
-    ->count();
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->count();
 
         // If AJAX request, return only the table partial
         if ($request->ajax()) {
             return view('admin.exams.table', compact(
                 'exams',
-                'pageTitle','usersCount','archived','published','draft'
+                'pageTitle','usersCount','archived','published','draft','perPage','status'
                 ))->render();
         }       
 
-        return view('admin.exams.index', compact('exams','pageTitle','usersCount','archived','published','draft'));
+        return view('admin.exams.index', compact(
+            'exams','pageTitle','usersCount','archived','published','draft','perPage','status'
+        ));
     }
 
     public function create(Request $request)

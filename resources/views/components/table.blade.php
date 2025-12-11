@@ -120,6 +120,35 @@
                                     </button>
                                 </form>
                             @endif
+                            @if(isset($actions['remove']))
+                                {{-- Check if item is not assigned to any exam --}}
+                                @if(isset($item->exams) && $item->exams->count() == 0)
+                                    <form 
+                                        id="delete-form-{{ $item->id }}" 
+                                        action="{{ route($actions['remove'], $item->id) }}" 
+                                        method="POST" 
+                                        style="display: inline;"
+                                        data-action="DELETE this data immediately"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" 
+                                                onclick="triggerConfirmModal('delete-form-{{ $item->id }}')"
+                                                class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
+                                                title="Delete">
+                                            <x-heroicon-o-trash class="w-4 h-4" />
+                                        </button>
+                                    </form>
+                                @else
+                                    {{-- Show disabled button with tooltip if assigned --}}
+                                    <button type="button" 
+                                            disabled
+                                            class="inline-flex items-center justify-center w-8 h-8 text-gray-400 bg-gray-100 rounded-full cursor-not-allowed"
+                                            title="Cannot delete: Question is assigned to exams">
+                                        <x-heroicon-o-trash class="w-4 h-4" />
+                                    </button>
+                                @endif
+                            @endif
                         </td>
                     @endif
                 </tr>
@@ -149,7 +178,7 @@
 
     <!-- Pagination Links -->
     @if($items->hasPages())
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 flex-wrap">
             {{-- Previous Page Link --}}
             @if ($items->onFirstPage())
                 <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
@@ -161,8 +190,23 @@
                 </a>
             @endif
 
-            {{-- Pagination Elements --}}
-            @foreach ($items->getUrlRange(1, $items->lastPage()) as $page => $url)
+            {{-- First Page Link --}}
+            @if($items->currentPage() > 3)
+                <a href="{{ $items->url(1) }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    1
+                </a>
+                @if($items->currentPage() > 4)
+                    <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                @endif
+            @endif
+
+            {{-- Pagination Elements (Smart Range) --}}
+            @php
+                $start = max(1, $items->currentPage() - 2);
+                $end = min($items->lastPage(), $items->currentPage() + 2);
+            @endphp
+
+            @foreach ($items->getUrlRange($start, $end) as $page => $url)
                 @if ($page == $items->currentPage())
                     <span class="pagination-link px-3 py-2 text-sm text-white bg-primary rounded-lg font-medium">
                         {{ $page }}
@@ -173,6 +217,16 @@
                     </a>
                 @endif
             @endforeach
+
+            {{-- Last Page Link --}}
+            @if($items->currentPage() < $items->lastPage() - 2)
+                @if($items->currentPage() < $items->lastPage() - 3)
+                    <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                @endif
+                <a href="{{ $items->url($items->lastPage()) }}" class="pagination-link px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    {{ $items->lastPage() }}
+                </a>
+            @endif
 
             {{-- Next Page Link --}}
             @if ($items->hasMorePages())

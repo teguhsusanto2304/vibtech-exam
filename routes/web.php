@@ -14,6 +14,10 @@ Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsR
     ->middleware('auth')
     ->name('notifications.read');
 
+Route::delete('/notifications/{id}', [NotificationController::class, 'delete'])
+    ->middleware('auth')
+    ->name('notifications.delete');
+
 
 Route::post('/ckeditor/upload', [CKEditorController::class, 'upload'])->name('ckeditor.upload');
 

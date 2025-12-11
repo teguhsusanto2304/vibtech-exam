@@ -34,7 +34,8 @@ class AdminController extends Controller
             if(Auth::user()->role=='admin')
             {
                 dd(Auth::user()->role);
-                return redirect()->intended('admin/dashboard')->with('success', 'Welcome back!');
+                //return redirect()->intended('admin/dashboard')->with('success', 'Welcome back!');
+                return redirect()->intended('admin/users')->with('success', 'Welcome back!');
             } else if(Auth::user()->role=='userx') {
                 $hasExam = UserExam::with('exam')->where('user_id', Auth::user()->id)
                     ->whereDate('active_date', '<=', now())
@@ -61,8 +62,6 @@ class AdminController extends Controller
                         'email' => 'You have already passed the exam successfully. Further attempts are not allowed.',
                     ])->onlyInput('email');
                 }
-
-
 
                 return redirect()->intended('');
             }
@@ -286,7 +285,7 @@ class AdminController extends Controller
             'notStartedExams',
             'currentMonthYear'
         ));
-        
+
     }
 
     

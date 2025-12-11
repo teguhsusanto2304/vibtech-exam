@@ -105,24 +105,54 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required', 
+                'string', 
+                'email', 
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // Check if email exists in non-suspended users
+                    $existingUser = User::where('email', $value)
+                        ->whereIn('data_status', ['active', 'inactive'])
+                        ->exists();
+                    
+                    if ($existingUser) {
+                        $fail('The email has already been taken.');
+                    }
+                },
+            ],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string', 'max:255'],
-            'company' => ['nullable', 'string', 'max:255'], // example extra field
+            'company' => ['nullable', 'string', 'max:255'],
         ]);
 
-        // ✅ 2. Create user
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'role' => $validated['role'] ?? 'user', // default to "user" if not provided
-            'company' => $validated['company'] ?? null,
-        ]);
-
-        // ✅ 3. Redirect or return response
-        return redirect()->route('admin.users')
+        $checkUser = User::where('email',$validated['email'])
+            ->where('data_status','suspended')
+            ->first();
+            if($checkUser)
+            {
+                $checkUser->update([
+                    'name' => $validated['name'],
+                    'password' => bcrypt($validated['password']),
+                    'role' => 'user',
+                    'company' => $validated['company'] ?? null,
+                    'data_status' => 'active',
+                ]);
+                return redirect()->route('admin.users')
+            ->with('success', "User '{$checkUser->name}' restored successfully!");
+            } else {
+                $user = User::create([
+                            'name' => $validated['name'],
+                            'email' => $validated['email'],
+                            'password' => bcrypt($validated['password']),
+                            'role' => $validated['role'] ?? 'user', // default to "user" if not provided
+                            'company' => $validated['company'] ?? null,
+                            'data_status' => 'active',
+                        ]);
+                        return redirect()->route('admin.users')
             ->with('success', "User '{$user->name}' created successfully!");
+            }
+        
     }
 
     public function update(Request $request, $id)

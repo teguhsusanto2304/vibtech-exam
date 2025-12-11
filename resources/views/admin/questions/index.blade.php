@@ -70,14 +70,20 @@
 <div class="flex items-center gap-4">
 <div class="flex-1">
 <label class="flex flex-col w-full">
-<div class="flex w-full flex-1 items-stretch rounded-lg h-10">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-10 gap-2">
     
     <input type="text" id="search" placeholder="Search questions..."
-                class="w-1/2 px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
+                class="flex-1 px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                 autocomplete="off">
-                <a href="{{ route('admin.question-banks') }}"
+    <select id="perPage" class="px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 bg-white">
+        <option value="10" {{ request('per_page', 50) == 10 ? 'selected' : '' }}>10 per page</option>
+        <option value="25" {{ request('per_page', 50) == 25 ? 'selected' : '' }}>25 per page</option>
+        <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50 per page</option>
+        <option value="100" {{ request('per_page', 50) == 100 ? 'selected' : '' }}>100 per page</option>
+    </select>
+    <a href="{{ route('admin.question-banks') }}"
             id="clearSearch" 
-            class="ml-2 px-3 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+            class="px-3 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition"
         >
             Clear
 </a>
@@ -103,14 +109,17 @@
 </main>
 <script>
     const searchInput = document.getElementById('search');
+    const perPageSelect = document.getElementById('perPage');
     let timeout = null;
 
+    // Handle search
     searchInput.addEventListener('keyup', function() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             let search = this.value;
+            let perPage = perPageSelect.value;
 
-            fetch(`{{ route('admin.question-banks') }}?search=${encodeURIComponent(search)}`, {
+            fetch(`{{ route('admin.question-banks') }}?search=${encodeURIComponent(search)}&per_page=${perPage}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => response.text())
@@ -121,16 +130,39 @@
         }, 300);
     });
 
+    // Handle per_page change
+    perPageSelect.addEventListener('change', function() {
+        let search = searchInput.value;
+        let perPage = this.value;
+
+        fetch(`{{ route('admin.question-banks') }}?search=${encodeURIComponent(search)}&per_page=${perPage}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('userTable').innerHTML = html;
+        })
+        .catch(err => console.error(err));
+    });
+
     // Handle pagination clicks dynamically
     document.addEventListener('click', function(e) {
-        if (e.target.matches('#userTable .pagination a')) {
+        if (e.target.matches('#userTable .pagination a') || e.target.closest('#userTable .pagination a')) {
             e.preventDefault();
-            fetch(e.target.href, {
+            let search = searchInput.value;
+            let perPage = perPageSelect.value;
+            let url = e.target.href || e.target.closest('a').href;
+            
+            // Append per_page to URL
+            url += (url.includes('?') ? '&' : '?') + 'per_page=' + perPage;
+            
+            fetch(url, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => response.text())
             .then(html => {
                 document.getElementById('userTable').innerHTML = html;
+                document.querySelector('#userTable').scrollIntoView({ behavior: 'smooth' });
             });
         }
     });

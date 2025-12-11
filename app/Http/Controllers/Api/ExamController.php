@@ -229,9 +229,13 @@ class ExamController extends Controller
             ->first();
         $user = auth()->user();
         $new_attempts_used = $user->attempts_used+1; 
+        $correctCount = $result->answers->filter(function ($answer) {
+            return $answer->is_correct==true;
+        })->count();
         
         // Determine status based on score and attempts
-        if ($result->scores >= $result->exam->pass_mark) {
+        //if ($result->scores >= $result->exam->pass_mark) {
+        if ($correctCount >= $result->exam->pass_mark) {
             $status = 'passed';
         } elseif ($new_attempts_used < 3) {
             $status = 'pending';
@@ -244,6 +248,7 @@ class ExamController extends Controller
             if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
                 $result->data_status=$status;
             }
+            $result->scores = round(($correctCount / $result->exam->questions) * 100);
             $result->save();
 
             
@@ -255,9 +260,7 @@ class ExamController extends Controller
             $user->save();
         }
 
-        $correctCount = $result->answers->filter(function ($answer) {
-            return $answer->is_correct==true;
-        })->count();
+        
 
         if (!$result) {
             return response()->json([
@@ -269,8 +272,8 @@ class ExamController extends Controller
         $admins = User::where('role', 'admin')->get();
         if($status=='passed' || ($status=='cancel' && $new_attempts_used==3)){
             Notification::send($admins, new ExamStatusUpdated($result,$student->name, $status));
-            //Mail::to('teguh.susanto@hotmail.com')->send(new ExamResultMail($student, $result, $status));
-            Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
+            Mail::to('teguh.susanto@gmail.com')->send(new ExamResultMail($student, $result, $status));
+            //Mail::to($student->email)->send(new ExamResultMail($student, $result, $status));
         }
         
         return response()->json([            

@@ -56,6 +56,35 @@ function getPendingExams($user)
         ->get();
 }
 
+function getOverDueUserExams()
+{
+    $userExams = \App\Models\UserExam::query()
+    ->where('data_status', 'pending')
+        
+    ->where('end_date', '<', now()) 
+
+    ->whereNull('finished_at') 
+    
+    // 3. Mengambil hasil (Collection)
+
+        ->with(['user', 'exam'])
+        ->get();
+    
+    $admins = \App\Models\User::where('role', 'admin')->get();
+    
+    foreach($userExams as $row)
+    {
+        $userExamUpdate = \App\Models\UserExam::find($row->id);
+        $userExamUpdate->data_status = 'cancel';
+        $userExamUpdate->save();
+        
+        // Send notification to admins
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\ExamStatusUpdated($userExamUpdate, $userExamUpdate->user->name, 'cancel'));
+    }
+    
+    return $userExams;
+}
+
 /**
  * Get overdue exams (passed deadline but not completed)
  * 

@@ -17,7 +17,7 @@
 </div>
 <nav class="flex-1 p-4">
 <ul class="flex flex-col gap-2">
-<li>
+<li style="display:none;">
 <a class="flex items-center gap-3 rounded-lg px-3 py-2 {{ Request::routeIs('admin.dashboard') 
               ? 'bg-primary/10 text-primary dark:text-primary' 
               : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary' }} dark:text-text-dark-secondary hover:bg-primary/10 hover:text-primary dark:hover:text-primary transition-colors" href="{{ route('admin.dashboard') }}">

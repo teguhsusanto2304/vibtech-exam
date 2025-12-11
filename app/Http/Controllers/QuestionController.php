@@ -12,8 +12,13 @@ class QuestionController extends Controller
         $pageTitle =' Question Management';
         // Search filter
         $search = $request->get('search');
+        $perPage = $request->get('per_page', 50); // Default 50, can be changed via query param
+
+        // Validate per_page to prevent abuse
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 50;
 
         $questions = Question::query()
+        ->with('exams') // Eager load exams relasi
         ->whereNot('data_status','inactive')
         ->when($search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
@@ -21,8 +26,8 @@ class QuestionController extends Controller
             });
         })
         ->orderBy('created_at', 'desc')
-        ->paginate(10)
-        ->appends(['search' => $search]);
+        ->paginate($perPage, ['*'], 'page')
+        ->appends(['search' => $search, 'per_page' => $perPage]);
 
         $usersCount = Question::query()
     // Apply the search filter if a search term exists
@@ -37,10 +42,10 @@ class QuestionController extends Controller
 
         // If AJAX request, return only the table partial
         if ($request->ajax()) {
-            return view('admin.questions.table', compact('questions','pageTitle','usersCount'))->render();
+            return view('admin.questions.table', compact('questions','pageTitle','usersCount','perPage'))->render();
         }       
 
-        return view('admin.questions.index', compact('questions','pageTitle','usersCount'));
+        return view('admin.questions.index', compact('questions','pageTitle','usersCount','perPage'));
     }
 
     public function create(Request $request)
