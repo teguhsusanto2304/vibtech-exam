@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/exams/{id}/show', [ExamController::class,'show'])->name('admin.exams.show');
     Route::get('/admin/exams/{id}/edit', [ExamController::class,'edit'])->name('admin.exams.edit');
     Route::put('/admin/exams/{id}/update-status',[ExamController::class,'examUpdateStatus'])->name('admin.exams.update-status');
+    Route::put('/admin/exams/{id}/change-status',[ExamController::class,'examChangeStatus'])->name('admin.exams.change-status');
     Route::get('/admin/exams/{id}/questions', [ExamController::class,'questions'])->name('admin.exams.questions');
     Route::post('/admin/exams/{id}/assign-questions', [ExamController::class, 'assignQuestions'])
         ->name('admin.exams.assign-questions');

@@ -67,7 +67,7 @@
                     <button class="tab-btn inline-block p-4 border-b-2 rounded-t-lg {{ request('status') === 'draft' ? 'active text-blue-600 border-blue-600' : 'text-gray-500 hover:text-gray-600 hover:border-gray-300' }}"
                         data-status="draft" type="button">Draft</button>
                 </li>
-                <li class="me-2" role="presentation">
+                <li class="me-2" role="presentation" style="display: none;">
                     <button class="tab-btn inline-block p-4 border-b-2 rounded-t-lg {{ request('status') === 'archived' ? 'active text-blue-600 border-blue-600' : 'text-gray-500 hover:text-gray-600 hover:border-gray-300' }}"
                         data-status="archived" type="button">Archived</button>
                 </li>
@@ -80,6 +80,14 @@
         </div>
     </div>
 </main>
+@if(session('focus_tab') === 'draft')
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const draftBtn = document.querySelector('.tab-btn[data-status="draft"]');
+    if (draftBtn) draftBtn.click();
+});
+</script>
+@endif
 
 <script>
     const searchInput = document.getElementById('search');

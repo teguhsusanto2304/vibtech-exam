@@ -83,7 +83,7 @@
                                 @if($exam->data_status==='publish')
                                 <form 
                                     id="exam-status-form-{{ $exam->id }}" 
-                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    action="{{ route('admin.exams.change-status', ['id'=>$exam->id]) }}" 
                                     method="POST" 
                                     style="display: inline;" 
                                     data-action="DRAFT this exam immediately"
@@ -94,7 +94,7 @@
                                     <button type="button" 
                                             onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
                                             class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
-                                            title="Publish">
+                                            title="Draft">
                                         <x-heroicon-o-lock-open class="w-4 h-4" />
                                     </button>
                                 </form>
@@ -129,7 +129,7 @@
                                 @if($exam->data_status==='draft')
                                 <form 
                                     id="exam-status-form-{{ $exam->id }}" 
-                                    action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+                                    action="{{ route('admin.exams.change-status', ['id'=>$exam->id]) }}" 
                                     method="POST" 
                                     style="display: inline;" 
                                     data-action="DELETE this exam immediately"
@@ -140,7 +140,7 @@
                                     <button type="button" 
                                             onclick="triggerConfirmModal('exam-status-form-{{ $exam->id }}')" {{-- <--- ADDED JS CALL --}}
                                             class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-100 rounded-full"
-                                            title="Delrtr">
+                                            title="Delete">
                                         <x-heroicon-o-trash class="w-4 h-4" />
                                     </button>
                                 </form>

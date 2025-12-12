@@ -295,6 +295,30 @@ class ExamController extends Controller
         }
     }
 
+    public function examChangeStatus($id,Request $request)
+    {
+        $exam = Exam::findOrFail($id);
+        
+        // Check if exam has questions before activating
+        if ($request->data_status === 'publish' && $exam->examQuestions()->count() === 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot change status — this exam has no questions assigned.');
+        }
+        $userExamCount = UserExam::where(['exam_id'=>$exam->id,'data_status'=>'pending'])->count();
+        if ($exam->data_status === 'publish' && $request->data_status==='draft' && $userExamCount > 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot change status. This exam is currently active (being taken by users).');
+        }
+
+        $exam->data_status = $request->data_status;
+        $exam->save();
+        $status = $exam->data_status.''.($exam->data_status=='archived'?'':'ed');
+        $status = ($status=='archived'?'deleted':$status);
+        return redirect()->route('admin.exams')->with('success', 'Exam '.$status.' successfully.')->with('focus_tab', 'draft');
+    }
+
     public function show($id)
     {
         $exam = Exam::find($id);

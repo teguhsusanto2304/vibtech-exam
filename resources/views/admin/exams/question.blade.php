@@ -73,7 +73,7 @@
         <div class="inline-flex rounded-lg shadow-md" role="group">
         @if($exam->data_status=='draft')
             {{-- PENDING BUTTON (Requires Confirmation) --}}
-            <form action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
+            <form style="display:none;" action="{{ route('admin.exams.update-status', ['id'=>$exam->id]) }}" 
                   method="POST" 
                   style="display: inline;" 
                   class="needs-confirmation" 
@@ -107,7 +107,7 @@
                                bg-green-500 hover:bg-green-600 
                                dark:bg-green-700 dark:hover:bg-green-600 
                                text-white text-sm font-bold 
-                               border-r border-green-600 dark:border-green-800">
+                               border-r border-green-600 dark:border-green-800 rounded-l-lg">
                     <span class="truncate">Publish</span>
                 </button>
             </form>
