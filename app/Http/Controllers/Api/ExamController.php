@@ -237,7 +237,7 @@ class ExamController extends Controller
         
         // Determine status based on score and attempts
         //if ($result->scores >= $result->exam->pass_mark) {
-        if ($correctCount >= $result->exam->pass_mark) {
+        if ($scores >= $result->exam->pass_mark) {
             $status = 'passed';
         } elseif ($new_attempts_used < 3) {
             $status = 'pending';
