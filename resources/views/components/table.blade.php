@@ -122,7 +122,7 @@
                             @endif
                             @if(isset($actions['remove']))
                                 {{-- Check if item is not assigned to any exam --}}
-                                @if(isset($item->exams) && $item->exams->count() == 0)
+                                @if(isset($item->exams) && $item->exams->whereIn('data_status', ['publish', 'draft'])->count() === 0)
                                     <form 
                                         id="delete-form-{{ $item->id }}" 
                                         action="{{ route($actions['remove'], $item->id) }}" 
