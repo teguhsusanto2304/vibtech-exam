@@ -181,7 +181,8 @@
         <div class="flex flex-col bg-content-light dark:bg-content-dark rounded-xl border border-border-light dark:border-border-dark">
             <div class="p-4 border-b border-border-light dark:border-border-dark">
                 <h2 class="text-text-light dark:text-text-dark text-lg font-bold">Question Bank</h2>
-                <p class="text-subtle-light dark:text-subtle-dark text-sm">Select questions to add to the exam.</p>
+                <p class="text-subtle-light dark:text-subtle-dark text-sm">Select questions to add to the exam. ( <label id="selectedCount">0 selected</label> )</p>
+
             </div>
 
             <!-- Question List -->
@@ -222,7 +223,7 @@
                 <button {{ $disabled }}
                     class="w-full text-center px-4 py-2 text-sm font-semibold text-white rounded-lg bg-primary hover:bg-primary/90 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-600"
                 >
-                    Add Selected
+                    Add <label id="selectedCountBtn">0 selected</label>
                 </button>
             </div>
         </div>
@@ -324,6 +325,32 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const counter = document.getElementById('selectedCount');
+    const counterBtn = document.getElementById('selectedCountBtn');
+    //const addBtn = document.getElementById('addSelectedBtn');
+
+    function updateCounter() {
+        const checkedCount = document.querySelectorAll(
+            'input[name="questions[]"]:checked'
+        ).length;
+
+        counter.textContent = `${checkedCount} selected`;
+        counterBtn.textContent = `${checkedCount} selected`;
+        //addBtn.disabled = checkedCount === 0;
+    }
+
+    // Initial count (important for edit page)
+    updateCounter();
+
+    // Listen for select / unselect
+    document.querySelectorAll('input[name="questions[]"]').forEach(cb => {
+        cb.addEventListener('change', updateCounter);
+    });
+});
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
