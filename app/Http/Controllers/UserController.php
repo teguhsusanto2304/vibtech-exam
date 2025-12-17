@@ -134,7 +134,7 @@ class UserController extends Controller
                 $checkUser->update([
                     'name' => $validated['name'],
                     'password' => bcrypt($validated['password']),
-                    'role' => 'user',
+                    //'role' => 'user',
                     'company' => $validated['company'] ?? null,
                     'data_status' => 'active',
                 ]);
