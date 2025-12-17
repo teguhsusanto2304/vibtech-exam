@@ -61,7 +61,7 @@
 </div>
 <div class="flex flex-col gap-3 p-4 text-center">
 <p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">{{ $appName }}</p>
-<p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Welcome back. Please log in to continue.</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Welcome. Please log in to continue.</p>
 </div>
     @if ($errors->any())
     <x-alert-message type="error">
@@ -118,7 +118,7 @@
 </form>
 <!-- END: Added Form Tag -->
 </div>
-<div class="mt-8 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
+<div style="display:none;" class="mt-8 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
 @php
     $supportEmail = getSetting('support_email', '#');
 @endphp
