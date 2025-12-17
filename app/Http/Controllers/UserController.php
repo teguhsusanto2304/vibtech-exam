@@ -281,7 +281,7 @@ class UserController extends Controller
         $user->update(['data_status' => 'suspended']); // Correctly using 'deleted'
 
         // Optional: add flash message
-        return back()->with(['focus_tab'=>$user->data_status,'role'=>$user->role])->with('success', "User has deleted.");
+        return back()->with(['focus_tab'=>'inactive','role'=>$user->role])->with('success', "User has deleted.");
     }
 
     public function updateExam(Request $request, $id)
