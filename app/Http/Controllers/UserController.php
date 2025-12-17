@@ -150,6 +150,7 @@ class UserController extends Controller
                             'data_status' => 'active',
                         ]);
                         return redirect()->route('admin.users')
+                        ->with(['focus_tab'=>$user->data_status,'role'=>$user->role])
             ->with('success', "User '{$user->name}' created successfully!");
             }
         
@@ -165,7 +166,7 @@ class UserController extends Controller
            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             //'password' => ['nullable', 'string', 'min:8'],
-            'role' => ['required', 'string', 'max:255'],
+            //'role' => ['required', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'], // example extra field
         ]);
 
@@ -180,7 +181,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users')->with(['focus_tab'=>$user->data_status,'role'=>$user->role])->with('success', 'User updated successfully.');
     }
 
     public function show($id)
@@ -254,7 +255,8 @@ class UserController extends Controller
     public function toggleStatus($id)
     {
         $user = User::findOrFail($id);
-        if($user->role==='admin')
+        $tab_active = $user->data_status;
+        if($user->role==='admin' && $user->data_status==='active')
         {
             if( User::where(['role'=>'admin','data_status'=>'active'])->count() === 1 )
             {
@@ -267,7 +269,7 @@ class UserController extends Controller
         $user->save();
 
         // Optional: add flash message
-        return back()->with('success', "User status changed to {$user->data_status}.");
+        return back()->with(['focus_tab'=>$tab_active,'role'=>$user->role])->with('success', "User status changed to {$user->data_status}.");
     }
 
     public function destroy($id)

@@ -92,13 +92,16 @@
         </div>
     </div>
 </main>
-
 <script>
+    const initialRole = "{{ session('role', 'admin') }}";
+    const initialStatus = "{{ session('focus_tab', 'active') }}";
+
     const searchInput = document.getElementById('search');
     const filterByInput = document.getElementById('filterByElement');
     const tabButtons = document.querySelectorAll('.tab-btn');
-    let activeRole = 'admin';
-    let activeStatus = 'active';
+    let activeRole = initialRole;
+    let activeStatus = initialStatus;
+
     let timeout = null;
 
     // 🔄 Fetch users based on tab + search + status
@@ -121,6 +124,9 @@
         timeout = setTimeout(fetchUsers, 300);
     });
 
+    
+
+
     // 🧭 Tab switch
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -131,6 +137,19 @@
             fetchUsers();
         });
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const targetTab = document.querySelector(
+        `.tab-btn[data-role="${activeRole}"][data-status="${activeStatus}"]`
+    );
+
+    if (targetTab) {
+        targetTab.click(); // ✅ now works
+    } else {
+        fetchUsers(); // fallback
+    }
+});
+
 
     // 📄 Handle pagination dynamically with query params preserved
     document.addEventListener('click', function(e) {
