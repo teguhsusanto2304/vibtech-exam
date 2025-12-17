@@ -94,6 +94,7 @@
                         type="password" 
                         id="password" 
                         name="password"
+                        autocomplete="off"
                         class="flex-1 border border-gray-300 rounded-l-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
                         placeholder="{{ isset($user) ? 'Leave blank to keep current password' : 'Enter password' }}"
                     >
