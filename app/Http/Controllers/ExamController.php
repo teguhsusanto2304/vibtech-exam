@@ -208,7 +208,7 @@ class ExamController extends Controller
     public function questions(Request $request,$id)
     {
         $exam = Exam::find($id);
-        $questions = Question::all();
+        $questions = Question::where('data_status','active')->get();
         $pageTitle = 'Question Manage';
         $examQuestion = ExamQuestion::where('exam_id',$id)->get();
 
@@ -221,9 +221,7 @@ class ExamController extends Controller
         $maxQuestions = (int) $exam->questions; 
 
         $questionIds = $request->input('questions', []); // array of UUIDs
-        $currentQuestionIds = $exam->examQuestions()
-        ->where('data_status', 'active')
-        ->pluck('question_id')->toArray();
+        $currentQuestionIds = $exam->examQuestions()->pluck('question_id')->toArray();
 
         $newQuestionIds = array_diff($questionIds, $currentQuestionIds);
 
@@ -336,7 +334,7 @@ class ExamController extends Controller
     public function show($id)
     {
         $exam = Exam::find($id);
-        $questions = Question::where('data_status', 'active')->get();;
+        $questions = Question::where('data_status','active')->get();
         $pageTitle = 'Exam Details';
         $examQuestion = ExamQuestion::where('exam_id',$id)->get();
 
