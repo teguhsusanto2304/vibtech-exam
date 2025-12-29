@@ -1,3 +1,13 @@
+<style>
+    /* Menyembunyikan logo Laravel di header default */
+    .header a img, .header img {
+        display: none !important;
+    }
+    /* Pastikan logo Anda sendiri tetap muncul */
+    .my-custom-logo img {
+        display: block !important;
+    }
+</style>
 <x-mail::message>
 @slot('header')
     {{-- Biarkan kosong atau isi dengan spasi --}}
@@ -12,7 +22,10 @@ $logoUrl = $appLogo ? url($appLogo) : asset('images/logo.png');
 
 <div style="text-align: center; margin-bottom: 30px;">
     @if($appLogo)
-        <img src="{{ url($appLogo) }}" alt="{{ $appName }} Logo" style="max-width: 200px; height: auto;">
+        <img src="{{ url($appLogo) }}" alt="{{ $appName }} Logo" class="my-custom-logo" style="max-width: 100px; height: auto;">
+        <div style="font-size: 24px; font-weight: bold; color: #005A9C;">
+            {{ $appName }}
+        </div>
     @else
         <div style="font-size: 24px; font-weight: bold; color: #005A9C;">
             {{ $appName }}
