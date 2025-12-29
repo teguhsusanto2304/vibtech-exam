@@ -1,13 +1,18 @@
 <x-mail::message>
+@slot('header')
+    {{-- Biarkan kosong atau isi dengan spasi --}}
+@endslot
 {{-- Logo dari Settings Table --}}
 @php
-    $appLogo = getSetting('app_logo', '/images/logo.png');
+    $appLogo = getSetting('app_logo');
+// Jika di database hanya tersimpan nama file, gabungkan dengan URL
+$logoUrl = $appLogo ? url($appLogo) : asset('images/logo.png');
     $appName = getSetting('app_name', config('app.name'));
 @endphp
 
 <div style="text-align: center; margin-bottom: 30px;">
-    @if($appLogo && $appLogo !== '/images/logo.png')
-        <img src="{{ $appLogo }}" alt="{{ $appName }} Logo" style="max-width: 200px; height: auto;">
+    @if($appLogo)
+        <img src="{{ url($appLogo) }}" alt="{{ $appName }} Logo" style="max-width: 200px; height: auto;">
     @else
         <div style="font-size: 24px; font-weight: bold; color: #005A9C;">
             {{ $appName }}
